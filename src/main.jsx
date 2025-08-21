@@ -16,6 +16,7 @@ import Register from './pages/Register.jsx';
 import Login from './pages/Login.jsx';
 import TelegramCallback from './pages/TelegramCallback.jsx';
 import UserProfile from './pages/Profile.jsx';
+import VerifyAccount from './pages/verfiyPage.jsx';
 
 const router = createBrowserRouter([
   {
@@ -30,6 +31,10 @@ const router = createBrowserRouter([
         path: "/",
         element: <UserProfile />,
       },
+      {
+        path: "/verify-account",
+        element: <VerifyAccount />
+      }
     ],
     errorElement: <div>Page not found!</div>,
   },
