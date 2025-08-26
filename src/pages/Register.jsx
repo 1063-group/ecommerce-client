@@ -1,5 +1,5 @@
-// Register.jsx - Landscape/Album Layout
-import React, { useState } from 'react';
+// Register.jsx - Complete Fixed Version with Improved Error Handling
+import React, { useState, useEffect } from 'react';
 import { useDispatch } from 'react-redux';
 import { useNavigate, Link } from 'react-router-dom';
 import { register } from '../redux/slices/authSlice';
@@ -19,9 +19,16 @@ const Register = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+  const [successMessage, setSuccessMessage] = useState('');
 
   const dispatch = useDispatch();
   const navigate = useNavigate();
+
+  // Clear errors when switching auth methods
+  useEffect(() => {
+    setErrors({});
+    setSuccessMessage('');
+  }, [formData.authMethod]);
 
   // Real-time validation
   const validateField = (name, value) => {
@@ -39,8 +46,15 @@ const Register = () => {
       case 'phone':
         if (value) {
           const cleanPhone = value.replace(/\D/g, '');
-          if (!/^(\+998)?[0-9]{9}$/.test(cleanPhone)) {
-            newErrors.phone = 'Invalid phone format (+998XXXXXXXXX)';
+          
+          // ✅ Check valid Uzbekistan phone formats
+          const isValid = (
+            (cleanPhone.length === 12 && cleanPhone.startsWith('998')) || // +998991234567 -> 998991234567
+            (cleanPhone.length === 9) // 991234567
+          );
+          
+          if (!isValid) {
+            newErrors.phone = 'Enter valid Uzbekistan phone (+998XXXXXXXXX or XXXXXXXXX)';
           } else {
             delete newErrors.phone;
           }
@@ -98,6 +112,11 @@ const Register = () => {
   const handleInputChange = (e) => {
     const { name, value } = e.target;
     
+    // Clear success message when user starts typing
+    if (successMessage) {
+      setSuccessMessage('');
+    }
+    
     setFormData(prev => ({
       ...prev,
       [name]: value
@@ -110,14 +129,18 @@ const Register = () => {
     setFormData(prev => ({
       ...prev,
       authMethod: method,
+      // Clear opposite field when switching
       ...(method === 'email' ? { phone: '' } : { email: '' })
     }));
     
+    // Clear related errors
     setErrors(prev => {
       const newErrors = { ...prev };
       delete newErrors.email;
       delete newErrors.phone;
       delete newErrors.auth;
+      delete newErrors.submit;
+      delete newErrors.duplicate;
       return newErrors;
     });
   };
@@ -127,11 +150,19 @@ const Register = () => {
 
     // Check required fields
     if (!formData.firstName || formData.firstName.trim().length < 2) {
-      newErrors.firstName = 'First name is required';
+      newErrors.firstName = 'First name is required (min 2 characters)';
     }
 
     if (!formData.password || formData.password.length < 8) {
       newErrors.password = 'Password is required (min 8 characters)';
+    } else {
+      const hasUpper = /[A-Z]/.test(formData.password);
+      const hasLower = /[a-z]/.test(formData.password);
+      const hasNumber = /\d/.test(formData.password);
+      
+      if (!hasUpper || !hasLower || !hasNumber) {
+        newErrors.password = 'Password must contain uppercase, lowercase, and number';
+      }
     }
 
     if (!formData.confirmPassword || formData.confirmPassword !== formData.password) {
@@ -144,8 +175,20 @@ const Register = () => {
         newErrors.email = 'Valid email is required';
       }
     } else if (formData.authMethod === 'phone') {
-      if (!formData.phone || !/^(\+998)?[0-9]{9}$/.test(formData.phone.replace(/\D/g, ''))) {
-        newErrors.phone = 'Valid phone number is required';
+      if (!formData.phone) {
+        newErrors.phone = 'Phone number is required';
+      } else {
+        const cleanPhone = formData.phone.replace(/\D/g, '');
+        
+        // ✅ Check valid Uzbekistan phone formats
+        const isValid = (
+          (cleanPhone.length === 12 && cleanPhone.startsWith('998')) || // +998991234567 -> 998991234567
+          (cleanPhone.length === 9) // 991234567
+        );
+        
+        if (!isValid) {
+          newErrors.phone = 'Enter valid Uzbekistan phone (+998XXXXXXXXX or XXXXXXXXX)';
+        }
       }
     }
 
@@ -160,7 +203,10 @@ const Register = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    console.log('🚀 Form submitted!', formData); // Debug log
+    console.log('🚀 Form submitted!', formData);
+
+    // Clear previous messages
+    setSuccessMessage('');
 
     // Validate form
     if (!validateForm()) {
@@ -173,16 +219,24 @@ const Register = () => {
     setErrors({});
 
     try {
-      // Use Vite environment variables
       const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:8000';
+      
+      // ✅ Clean the data properly
       const requestData = {
-        email: formData.email || undefined,
-        phone: formData.phone || undefined,
+        email: formData.email.trim() || undefined,
+        phone: formData.phone.replace(/\D/g, '') || undefined,
         password: formData.password,
         firstName: formData.firstName.trim(),
         lastName: formData.lastName?.trim() || undefined,
         authMethod: formData.authMethod
       };
+
+      // Remove empty values to prevent null issues
+      Object.keys(requestData).forEach(key => {
+        if (requestData[key] === undefined || requestData[key] === '') {
+          delete requestData[key];
+        }
+      });
 
       console.log('📤 Sending request to:', `${apiUrl}/api/v1/auth/register`);
       console.log('📤 Request data:', requestData);
@@ -195,285 +249,239 @@ const Register = () => {
         body: JSON.stringify(requestData),
       });
 
-      console.log('📥 Response status:', response.status);
       const data = await response.json();
+      console.log('📥 Response status:', response.status);
       console.log('📥 Response data:', data);
 
       if (response.ok) {
         console.log('✅ Registration successful!');
-        dispatch(register({
-          user: data.user,
-          token: data.token
-        }));
-
-        if (data.nextStep === 'verify_account') {
-          navigate('/verify-account', { 
-            state: { 
-              message: 'Please check your email/phone for verification code',
-              userId: data.user.id 
+        setSuccessMessage('Registration successful! Redirecting to verification...');
+        
+        // Navigate to verification page with user data
+        setTimeout(() => {
+          navigate('/verify-account', {
+            state: {
+              message: data.message,
+              userId: data.user.id,
+              email: data.user.email,
+              phone: data.user.phone,
+              authMethod: data.user.authMethod,
+              nextStep: data.nextStep
             }
           });
-        } else {
-          navigate('/');
-        }
+        }, 1500);
+
       } else {
-        console.log('❌ Registration failed:', data);
-        if (data.errors) {
-          setErrors(data.errors);
+        // ✅ Handle different error types
+        console.error('❌ Registration failed:', data);
+        
+        if (response.status === 409) {
+          // Duplicate user error
+          const field = data.field || 'email/phone';
+          setErrors({
+            duplicate: `A user with this ${field} already exists. Please use a different ${field} or try logging in.`,
+            [field]: `This ${field} is already registered`
+          });
+          
+          // Highlight the duplicate field
+          if (field === 'email') {
+            setFormData(prev => ({ ...prev, authMethod: 'email' }));
+          } else if (field === 'phone') {
+            setFormData(prev => ({ ...prev, authMethod: 'phone' }));
+          }
+        } else if (response.status === 400) {
+          // Validation errors
+          if (data.errors) {
+            setErrors(data.errors);
+          } else {
+            setErrors({ submit: data.message || 'Please check your input and try again' });
+          }
         } else {
-          setErrors({ submit: data.message || 'Registration failed' });
+          // Generic server error
+          setErrors({ 
+            submit: data.message || 'Registration failed. Please try again later.' 
+          });
         }
       }
     } catch (error) {
       console.error('❌ Network error:', error);
-      setErrors({ submit: 'Network error. Please check your connection and try again.' });
+      setErrors({ 
+        submit: 'Network error. Please check your connection and try again.' 
+      });
     } finally {
       setIsLoading(false);
     }
   };
 
-  const getPasswordStrength = (password) => {
-    if (!password) return { strength: 0, text: '' };
-    
-    let strength = 0;
-    let feedback = [];
-    
-    if (password.length >= 8) strength += 25;
-    else feedback.push('at least 8 characters');
-    
-    if (/[A-Z]/.test(password)) strength += 25;
-    else feedback.push('uppercase letter');
-    
-    if (/[a-z]/.test(password)) strength += 25;
-    else feedback.push('lowercase letter');
-    
-    if (/\d/.test(password)) strength += 25;
-    else feedback.push('number');
-    
-    const colors = {
-      0: 'bg-gray-200',
-      25: 'bg-red-500',
-      50: 'bg-yellow-500',
-      75: 'bg-blue-500',
-      100: 'bg-green-500'
-    };
-    
-    const texts = {
-      0: '',
-      25: 'Weak',
-      50: 'Fair',
-      75: 'Good',
-      100: 'Strong'
-    };
-    
-    return {
-      strength,
-      color: colors[strength],
-      text: texts[strength],
-      feedback: feedback.length > 0 ? `Missing: ${feedback.join(', ')}` : 'Password looks good!'
-    };
+  // Clear form for new user
+  const handleClearForm = () => {
+    setFormData({
+      email: '',
+      phone: '',
+      password: '',
+      confirmPassword: '',
+      firstName: '',
+      lastName: '',
+      authMethod: 'email'
+    });
+    setErrors({});
+    setSuccessMessage('');
   };
-
-  const passwordStrength = getPasswordStrength(formData.password);
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-purple-900 via-blue-900 to-indigo-900 relative overflow-hidden">
-      {/* Animated Background Elements */}
+      {/* Background Elements */}
       <div className="absolute inset-0 overflow-hidden">
-        <div className="absolute -top-32 -right-40 w-96 h-96 bg-gradient-to-br from-pink-400 to-purple-600 rounded-full mix-blend-multiply filter blur-3xl opacity-25 animate-pulse"></div>
-        <div className="absolute -bottom-32 -left-40 w-96 h-96 bg-gradient-to-br from-cyan-400 to-blue-600 rounded-full mix-blend-multiply filter blur-3xl opacity-25 animate-pulse animation-delay-2000"></div>
-        <div className="absolute top-1/3 right-1/4 w-80 h-80 bg-gradient-to-br from-emerald-400 to-cyan-600 rounded-full mix-blend-multiply filter blur-3xl opacity-20 animate-pulse animation-delay-4000"></div>
+        <div className="absolute -top-40 -right-40 w-80 h-80 bg-gradient-to-br from-pink-400 to-purple-600 rounded-full mix-blend-multiply filter blur-3xl opacity-30 animate-pulse"></div>
+        <div className="absolute -bottom-40 -left-40 w-80 h-80 bg-gradient-to-br from-cyan-400 to-blue-600 rounded-full mix-blend-multiply filter blur-3xl opacity-30 animate-pulse animation-delay-2000"></div>
+        <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-96 h-96 bg-gradient-to-br from-emerald-400 to-cyan-600 rounded-full mix-blend-multiply filter blur-3xl opacity-20 animate-pulse animation-delay-4000"></div>
       </div>
 
-      {/* Grid pattern overlay */}
-      <div className="absolute inset-0 bg-black/5" style={{
-        backgroundImage: `radial-gradient(circle at 1px 1px, rgba(255,255,255,0.1) 1px, transparent 0)`,
-        backgroundSize: '20px 20px'
-      }}></div>
+      {/* Floating particles */}
+      <div className="absolute inset-0">
+        {[...Array(15)].map((_, i) => (
+          <div
+            key={i}
+            className="absolute bg-white rounded-full opacity-10 animate-bounce"
+            style={{
+              left: `${Math.random() * 100}%`,
+              top: `${Math.random() * 100}%`,
+              width: `${Math.random() * 4 + 2}px`,
+              height: `${Math.random() * 4 + 2}px`,
+              animationDelay: `${Math.random() * 3}s`,
+              animationDuration: `${Math.random() * 3 + 2}s`
+            }}
+          />
+        ))}
+      </div>
 
-      <div className="relative z-10 flex items-center justify-center min-h-screen p-4 lg:p-8">
-        <div className="w-full max-w-6xl">
-          {/* Main Container - Landscape Layout */}
-          <div className="bg-white/10 backdrop-blur-xl rounded-3xl shadow-2xl border border-white/20 overflow-hidden">
-            <div className="grid lg:grid-cols-2 min-h-[700px]">
+      <div className="relative z-10 flex items-center justify-center min-h-screen py-12 px-4 sm:px-6 lg:px-8">
+        <div className="max-w-2xl w-full">
+          <div className="bg-white/10 backdrop-blur-lg rounded-3xl shadow-2xl border border-white/20 p-8 space-y-8">
+            
+            {/* Header */}
+            <div className="text-center">
+              <div className="mx-auto h-16 w-16 bg-gradient-to-r from-purple-500 to-pink-500 rounded-2xl flex items-center justify-center mb-6 shadow-lg">
+                <svg className="h-8 w-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z" />
+                </svg>
+              </div>
               
-              {/* Left Panel - Welcome Section */}
-              <div className="hidden lg:flex flex-col justify-center items-center p-12 bg-gradient-to-br from-purple-600/20 to-pink-600/20 relative">
-                {/* Decorative elements */}
-                <div className="absolute top-8 left-8 w-16 h-16 bg-white/10 rounded-full flex items-center justify-center">
-                  <svg className="w-8 h-8 text-white/70" fill="currentColor" viewBox="0 0 20 20">
-                    <path fillRule="evenodd" d="M3 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm0 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm0 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm0 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1z" clipRule="evenodd" />
+              <h2 className="text-3xl font-bold bg-gradient-to-r from-white to-purple-200 bg-clip-text text-transparent">
+                Create Account
+              </h2>
+              
+              <p className="mt-2 text-white/70">
+                Join us today and start your journey
+              </p>
+            </div>
+
+            {/* Success Message */}
+            {successMessage && (
+              <div className="bg-green-500/10 border border-green-400/30 rounded-xl p-4 animate-pulse">
+                <div className="flex items-center gap-2 text-green-300">
+                  <svg className="w-5 h-5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+                    <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
                   </svg>
-                </div>
-
-                <div className="text-center max-w-md">
-                  <div className="mb-8">
-                    <div className="w-20 h-20 bg-gradient-to-r from-purple-500 to-pink-500 rounded-3xl flex items-center justify-center mx-auto mb-6 shadow-2xl">
-                      <svg className="w-10 h-10 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" />
-                      </svg>
-                    </div>
-                  </div>
-
-                  <h1 className="text-4xl font-bold bg-gradient-to-r from-white to-purple-200 bg-clip-text text-transparent mb-4">
-                    Welcome to Our Store
-                  </h1>
-                  
-                  <p className="text-white/70 text-lg leading-relaxed mb-8">
-                    Join thousands of satisfied customers and discover amazing products at unbeatable prices.
-                  </p>
-
-                  {/* Features List */}
-                  <div className="space-y-4 text-left">
-                    {[
-                      { icon: "🛍️", text: "Exclusive deals and discounts" },
-                      { icon: "🚚", text: "Free shipping on orders over $50" },
-                      { icon: "🔒", text: "Secure and safe payments" },
-                      { icon: "💫", text: "24/7 customer support" }
-                    ].map((feature, index) => (
-                      <div key={index} className="flex items-center gap-3 text-white/80">
-                        <span className="text-xl">{feature.icon}</span>
-                        <span className="text-sm">{feature.text}</span>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-
-                {/* Bottom decorative element */}
-                <div className="absolute bottom-8 right-8 w-24 h-24 border border-white/20 rounded-full flex items-center justify-center">
-                  <div className="w-16 h-16 border border-white/30 rounded-full flex items-center justify-center">
-                    <div className="w-8 h-8 bg-white/20 rounded-full"></div>
-                  </div>
+                  <p className="text-sm font-medium">{successMessage}</p>
                 </div>
               </div>
+            )}
 
-              {/* Right Panel - Registration Form */}
-              <div className="p-8 lg:p-12 flex flex-col justify-center">
-                {/* Mobile Header */}
-                <div className="lg:hidden text-center mb-8">
-                  <div className="w-16 h-16 bg-gradient-to-r from-purple-500 to-pink-500 rounded-2xl flex items-center justify-center mx-auto mb-4">
-                    <svg className="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z" />
-                    </svg>
+            <form onSubmit={handleSubmit} className="space-y-6">
+              {/* Auth Method Tabs */}
+              <div className="grid grid-cols-2 bg-white/5 rounded-xl p-1">
+                <button
+                  type="button"
+                  onClick={() => handleAuthMethodChange('email')}
+                  className={`px-4 py-3 text-sm font-medium rounded-lg transition-all duration-300 ${
+                    formData.authMethod === 'email'
+                      ? 'bg-white/20 text-white shadow-lg'
+                      : 'text-white/60 hover:text-white/80 hover:bg-white/5'
+                  }`}
+                >
+                  📧 Email
+                </button>
+                <button
+                  type="button"
+                  onClick={() => handleAuthMethodChange('phone')}
+                  className={`px-4 py-3 text-sm font-medium rounded-lg transition-all duration-300 ${
+                    formData.authMethod === 'phone'
+                      ? 'bg-white/20 text-white shadow-lg'
+                      : 'text-white/60 hover:text-white/80 hover:bg-white/5'
+                  }`}
+                >
+                  📱 Phone
+                </button>
+              </div>
+
+              <div className="grid md:grid-cols-2 gap-6">
+                {/* Personal Info */}
+                <div className="space-y-4">
+                  <div className="space-y-2">
+                    <label className="text-white/90 text-sm font-medium">
+                      First Name <span className="text-red-400">*</span>
+                    </label>
+                    <div className="relative">
+                      <input
+                        name="firstName"
+                        type="text"
+                        required
+                        value={formData.firstName}
+                        onChange={handleInputChange}
+                        className={`w-full px-4 py-3 bg-white/10 border border-white/20 rounded-xl text-white placeholder-white/50 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all duration-300 ${
+                          errors.firstName ? 'border-red-400 bg-red-500/10' : 'hover:border-white/30'
+                        }`}
+                        placeholder="John"
+                      />
+                      <div className="absolute inset-y-0 right-0 pr-3 flex items-center">
+                        <svg className="h-5 w-5 text-white/30" fill="currentColor" viewBox="0 0 20 20">
+                          <path fillRule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clipRule="evenodd" />
+                        </svg>
+                      </div>
+                    </div>
+                    {errors.firstName && (
+                      <p className="text-red-300 text-xs flex items-center gap-1">
+                        <svg className="w-3 h-3" fill="currentColor" viewBox="0 0 20 20">
+                          <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
+                        </svg>
+                        {errors.firstName}
+                      </p>
+                    )}
                   </div>
-                  <h2 className="text-2xl font-bold text-white mb-2">Create Account</h2>
-                  <p className="text-white/70 text-sm">Join our platform today</p>
+
+                  <div className="space-y-2">
+                    <label className="text-white/90 text-sm font-medium">Last Name</label>
+                    <div className="relative">
+                      <input
+                        name="lastName"
+                        type="text"
+                        value={formData.lastName}
+                        onChange={handleInputChange}
+                        className={`w-full px-4 py-3 bg-white/10 border border-white/20 rounded-xl text-white placeholder-white/50 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all duration-300 ${
+                          errors.lastName ? 'border-red-400 bg-red-500/10' : 'hover:border-white/30'
+                        }`}
+                        placeholder="Doe"
+                      />
+                    </div>
+                    {errors.lastName && (
+                      <p className="text-red-300 text-xs flex items-center gap-1">
+                        <svg className="w-3 h-3" fill="currentColor" viewBox="0 0 20 20">
+                          <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
+                        </svg>
+                        {errors.lastName}
+                      </p>
+                    )}
+                  </div>
                 </div>
 
-                {/* Desktop Header */}
-                <div className="hidden lg:block mb-8">
-                  <h2 className="text-3xl font-bold text-white mb-2">Create Your Account</h2>
-                  <p className="text-white/70">Get started with your free account</p>
-                </div>
-
-                {/* Form */}
-                <form className="space-y-6" onSubmit={handleSubmit}>
-                  {/* Debug Info - Remove in production */}
-                  {import.meta.env.DEV && (
-                    <div className="bg-black/20 p-3 rounded-lg text-xs text-white/70">
-                      <strong>Debug:</strong> Auth: {formData.authMethod}, Email: {formData.email}, Phone: {formData.phone}, Password: {formData.password ? '***' : 'empty'}
-                      <br />
-                      <strong>API URL:</strong> {import.meta.env.VITE_API_URL || 'http://localhost:8000'}
-                    </div>
-                  )}
-                  {/* Auth Method Selection */}
-                  <div className="flex space-x-2 p-1 bg-white/5 rounded-xl border border-white/10">
-                    <button
-                      type="button"
-                      onClick={() => handleAuthMethodChange('email')}
-                      className={`flex-1 py-3 px-4 rounded-lg text-sm font-medium transition-all duration-300 ${
-                        formData.authMethod === 'email'
-                          ? 'bg-gradient-to-r from-purple-500 to-pink-500 text-white shadow-lg transform scale-105'
-                          : 'text-white/70 hover:text-white hover:bg-white/5'
-                      }`}
-                    >
-                      <span className="flex items-center justify-center gap-2">
-                        <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
-                          <path d="M2.003 5.884L10 9.882l7.997-3.998A2 2 0 0016 4H4a2 2 0 00-1.997 1.884z" />
-                          <path d="M18 8.118l-8 4-8-4V14a2 2 0 002 2h12a2 2 0 002-2V8.118z" />
-                        </svg>
-                        Email
-                      </span>
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => handleAuthMethodChange('phone')}
-                      className={`flex-1 py-3 px-4 rounded-lg text-sm font-medium transition-all duration-300 ${
-                        formData.authMethod === 'phone'
-                          ? 'bg-gradient-to-r from-purple-500 to-pink-500 text-white shadow-lg transform scale-105'
-                          : 'text-white/70 hover:text-white hover:bg-white/5'
-                      }`}
-                    >
-                      <span className="flex items-center justify-center gap-2">
-                        <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
-                          <path d="M2 3a1 1 0 011-1h2.153a1 1 0 01.986.836l.74 4.435a1 1 0 01-.54 1.06l-1.548.773a11.037 11.037 0 006.105 6.105l.774-1.548a1 1 0 011.059-.54l4.435.74a1 1 0 01.836.986V17a1 1 0 01-1 1h-2C7.82 18 2 12.18 2 5V3z" />
-                        </svg>
-                        Phone
-                      </span>
-                    </button>
-                  </div>
-
-                  {/* Name Fields */}
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div className="space-y-2">
-                      <label className="text-white/90 text-sm font-medium">First Name *</label>
-                      <div className="relative">
-                        <input
-                          name="firstName"
-                          type="text"
-                          required
-                          value={formData.firstName}
-                          onChange={handleInputChange}
-                          className={`w-full px-4 py-3 bg-white/10 border border-white/20 rounded-xl text-white placeholder-white/50 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all duration-300 ${
-                            errors.firstName ? 'border-red-400 bg-red-500/10' : 'hover:border-white/30'
-                          }`}
-                          placeholder="John"
-                        />
-                        <div className="absolute inset-y-0 right-0 pr-3 flex items-center">
-                          <svg className="h-5 w-5 text-white/30" fill="currentColor" viewBox="0 0 20 20">
-                            <path fillRule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clipRule="evenodd" />
-                          </svg>
-                        </div>
-                      </div>
-                      {errors.firstName && (
-                        <p className="text-red-300 text-xs flex items-center gap-1">
-                          <svg className="w-3 h-3" fill="currentColor" viewBox="0 0 20 20">
-                            <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
-                          </svg>
-                          {errors.firstName}
-                        </p>
-                      )}
-                    </div>
-
-                    <div className="space-y-2">
-                      <label className="text-white/90 text-sm font-medium">Last Name</label>
-                      <div className="relative">
-                        <input
-                          name="lastName"
-                          type="text"
-                          value={formData.lastName}
-                          onChange={handleInputChange}
-                          className={`w-full px-4 py-3 bg-white/10 border border-white/20 rounded-xl text-white placeholder-white/50 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all duration-300 ${
-                            errors.lastName ? 'border-red-400 bg-red-500/10' : 'hover:border-white/30'
-                          }`}
-                          placeholder="Doe"
-                        />
-                      </div>
-                      {errors.lastName && (
-                        <p className="text-red-300 text-xs flex items-center gap-1">
-                          <svg className="w-3 h-3" fill="currentColor" viewBox="0 0 20 20">
-                            <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
-                          </svg>
-                          {errors.lastName}
-                        </p>
-                      )}
-                    </div>
-                  </div>
-
-                  {/* Auth Field */}
+                {/* Auth Field */}
+                <div className="space-y-4">
                   {formData.authMethod === 'email' ? (
                     <div className="space-y-2">
-                      <label className="text-white/90 text-sm font-medium">Email Address *</label>
+                      <label className="text-white/90 text-sm font-medium">
+                        Email Address <span className="text-red-400">*</span>
+                      </label>
                       <div className="relative">
                         <input
                           name="email"
@@ -481,12 +489,12 @@ const Register = () => {
                           required
                           value={formData.email}
                           onChange={handleInputChange}
-                          className={`w-full px-4 py-3 pl-12 bg-white/10 border border-white/20 rounded-xl text-white placeholder-white/50 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all duration-300 ${
+                          className={`w-full px-4 py-3 bg-white/10 border border-white/20 rounded-xl text-white placeholder-white/50 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all duration-300 ${
                             errors.email ? 'border-red-400 bg-red-500/10' : 'hover:border-white/30'
                           }`}
                           placeholder="john@example.com"
                         />
-                        <div className="absolute inset-y-0 left-0 pl-3 flex items-center">
+                        <div className="absolute inset-y-0 right-0 pr-3 flex items-center">
                           <svg className="h-5 w-5 text-white/30" fill="currentColor" viewBox="0 0 20 20">
                             <path d="M2.003 5.884L10 9.882l7.997-3.998A2 2 0 0016 4H4a2 2 0 00-1.997 1.884z" />
                             <path d="M18 8.118l-8 4-8-4V14a2 2 0 002 2h12a2 2 0 002-2V8.118z" />
@@ -504,7 +512,9 @@ const Register = () => {
                     </div>
                   ) : (
                     <div className="space-y-2">
-                      <label className="text-white/90 text-sm font-medium">Phone Number *</label>
+                      <label className="text-white/90 text-sm font-medium">
+                        Phone Number <span className="text-red-400">*</span>
+                      </label>
                       <div className="relative">
                         <input
                           name="phone"
@@ -512,12 +522,12 @@ const Register = () => {
                           required
                           value={formData.phone}
                           onChange={handleInputChange}
-                          className={`w-full px-4 py-3 pl-12 bg-white/10 border border-white/20 rounded-xl text-white placeholder-white/50 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all duration-300 ${
+                          className={`w-full px-4 py-3 bg-white/10 border border-white/20 rounded-xl text-white placeholder-white/50 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all duration-300 ${
                             errors.phone ? 'border-red-400 bg-red-500/10' : 'hover:border-white/30'
                           }`}
                           placeholder="+998901234567"
                         />
-                        <div className="absolute inset-y-0 left-0 pl-3 flex items-center">
+                        <div className="absolute inset-y-0 right-0 pr-3 flex items-center">
                           <svg className="h-5 w-5 text-white/30" fill="currentColor" viewBox="0 0 20 20">
                             <path d="M2 3a1 1 0 011-1h2.153a1 1 0 01.986.836l.74 4.435a1 1 0 01-.54 1.06l-1.548.773a11.037 11.037 0 006.105 6.105l.774-1.548a1 1 0 011.059-.54l4.435.74a1 1 0 01.836.986V17a1 1 0 01-1 1h-2C7.82 18 2 12.18 2 5V3z" />
                           </svg>
@@ -534,10 +544,12 @@ const Register = () => {
                     </div>
                   )}
 
-                  {/* Password Fields - Side by Side on Desktop */}
-                  <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+                  {/* Password Fields */}
+                  <div className="space-y-4">
                     <div className="space-y-2">
-                      <label className="text-white/90 text-sm font-medium">Password *</label>
+                      <label className="text-white/90 text-sm font-medium">
+                        Password <span className="text-red-400">*</span>
+                      </label>
                       <div className="relative">
                         <input
                           name="password"
@@ -545,20 +557,15 @@ const Register = () => {
                           required
                           value={formData.password}
                           onChange={handleInputChange}
-                          className={`w-full px-4 py-3 pl-12 pr-12 bg-white/10 border border-white/20 rounded-xl text-white placeholder-white/50 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all duration-300 ${
+                          className={`w-full px-4 py-3 pr-12 bg-white/10 border border-white/20 rounded-xl text-white placeholder-white/50 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all duration-300 ${
                             errors.password ? 'border-red-400 bg-red-500/10' : 'hover:border-white/30'
                           }`}
-                          placeholder="Enter strong password"
+                          placeholder="Min 8 characters"
                         />
-                        <div className="absolute inset-y-0 left-0 pl-3 flex items-center">
-                          <svg className="h-5 w-5 text-white/30" fill="currentColor" viewBox="0 0 20 20">
-                            <path fillRule="evenodd" d="M5 9V7a5 5 0 0110 0v2a2 2 0 012 2v5a2 2 0 01-2 2H5a2 2 0 01-2-2v-5a2 2 0 012-2zm8-2v2H7V7a3 3 0 016 0z" clipRule="evenodd" />
-                          </svg>
-                        </div>
                         <button
                           type="button"
                           onClick={() => setShowPassword(!showPassword)}
-                          className="absolute inset-y-0 right-0 pr-3 flex items-center text-white/30 hover:text-white/70 transition-colors"
+                          className="absolute inset-y-0 right-0 pr-3 flex items-center text-white/30 hover:text-white/50 transition-colors"
                         >
                           {showPassword ? (
                             <svg className="h-5 w-5" fill="currentColor" viewBox="0 0 20 20">
@@ -574,19 +581,32 @@ const Register = () => {
                         </button>
                       </div>
 
-                      {/* Password Strength Indicator */}
+                      {/* Password strength indicator */}
                       {formData.password && (
-                        <div className="space-y-2">
-                          <div className="flex items-center gap-2">
-                            <div className="flex-1 bg-white/10 rounded-full h-2">
-                              <div
-                                className={`h-2 rounded-full transition-all duration-300 ${passwordStrength.color}`}
-                                style={{ width: `${passwordStrength.strength}%` }}
-                              />
-                            </div>
-                            <span className="text-xs text-white/70 min-w-[60px]">{passwordStrength.text}</span>
+                        <div className="space-y-1">
+                          <div className="flex justify-between items-center">
+                            <span className="text-white/60 text-xs">Password strength:</span>
+                            <span className={`text-xs ${
+                              formData.password.length >= 8 && 
+                              /[A-Z]/.test(formData.password) && 
+                              /[a-z]/.test(formData.password) && 
+                              /\d/.test(formData.password)
+                                ? 'text-green-300' 
+                                : 'text-red-300'
+                            }`}>
+                              {formData.password.length >= 8 && 
+                               /[A-Z]/.test(formData.password) && 
+                               /[a-z]/.test(formData.password) && 
+                               /\d/.test(formData.password) 
+                                ? 'Strong' 
+                                : 'Weak'}
+                            </span>
                           </div>
-                          <p className="text-xs text-white/60">{passwordStrength.feedback}</p>
+                          <div className="flex gap-1">
+                            <div className={`h-1 flex-1 rounded ${formData.password.length >= 4 ? 'bg-red-400' : 'bg-white/20'}`}></div>
+                            <div className={`h-1 flex-1 rounded ${formData.password.length >= 6 ? 'bg-yellow-400' : 'bg-white/20'}`}></div>
+                            <div className={`h-1 flex-1 rounded ${formData.password.length >= 8 && /[A-Z]/.test(formData.password) && /[a-z]/.test(formData.password) && /\d/.test(formData.password) ? 'bg-green-400' : 'bg-white/20'}`}></div>
+                          </div>
                         </div>
                       )}
 
@@ -601,7 +621,9 @@ const Register = () => {
                     </div>
 
                     <div className="space-y-2">
-                      <label className="text-white/90 text-sm font-medium">Confirm Password *</label>
+                      <label className="text-white/90 text-sm font-medium">
+                        Confirm Password <span className="text-red-400">*</span>
+                      </label>
                       <div className="relative">
                         <input
                           name="confirmPassword"
@@ -609,20 +631,15 @@ const Register = () => {
                           required
                           value={formData.confirmPassword}
                           onChange={handleInputChange}
-                          className={`w-full px-4 py-3 pl-12 pr-12 bg-white/10 border border-white/20 rounded-xl text-white placeholder-white/50 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all duration-300 ${
+                          className={`w-full px-4 py-3 pr-12 bg-white/10 border border-white/20 rounded-xl text-white placeholder-white/50 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all duration-300 ${
                             errors.confirmPassword ? 'border-red-400 bg-red-500/10' : 'hover:border-white/30'
                           }`}
-                          placeholder="Confirm your password"
+                          placeholder="Repeat password"
                         />
-                        <div className="absolute inset-y-0 left-0 pl-3 flex items-center">
-                          <svg className="h-5 w-5 text-white/30" fill="currentColor" viewBox="0 0 20 20">
-                            <path fillRule="evenodd" d="M5 9V7a5 5 0 0110 0v2a2 2 0 012 2v5a2 2 0 01-2 2H5a2 2 0 01-2-2v-5a2 2 0 012-2zm8-2v2H7V7a3 3 0 016 0z" clipRule="evenodd" />
-                          </svg>
-                        </div>
                         <button
                           type="button"
                           onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-                          className="absolute inset-y-0 right-0 pr-3 flex items-center text-white/30 hover:text-white/70 transition-colors"
+                          className="absolute inset-y-0 right-0 pr-3 flex items-center text-white/30 hover:text-white/50 transition-colors"
                         >
                           {showConfirmPassword ? (
                             <svg className="h-5 w-5" fill="currentColor" viewBox="0 0 20 20">
@@ -638,22 +655,22 @@ const Register = () => {
                         </button>
                       </div>
 
-                      {/* Password Match Indicator */}
+                      {/* Password match indicator */}
                       {formData.confirmPassword && (
-                        <div className="flex items-center gap-2">
-                          {formData.password === formData.confirmPassword ? (
+                        <div className="text-xs">
+                          {formData.confirmPassword === formData.password ? (
                             <div className="flex items-center gap-1 text-green-300">
                               <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
                                 <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
                               </svg>
-                              <span className="text-xs">Passwords match</span>
+                              <span>Passwords match</span>
                             </div>
                           ) : (
                             <div className="flex items-center gap-1 text-red-300">
                               <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
                                 <path fillRule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clipRule="evenodd" />
                               </svg>
-                              <span className="text-xs">Passwords don't match</span>
+                              <span>Passwords don't match</span>
                             </div>
                           )}
                         </div>
@@ -669,130 +686,112 @@ const Register = () => {
                       )}
                     </div>
                   </div>
-
-                  {/* General Errors */}
-                  {(errors.auth || errors.submit) && (
-                    <div className="bg-red-500/10 border border-red-400/30 rounded-xl p-4">
-                      <div className="flex items-center gap-2 text-red-300">
-                        <svg className="w-5 h-5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
-                          <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
-                        </svg>
-                        <p className="text-sm">{errors.auth || errors.submit}</p>
-                      </div>
-                    </div>
-                  )}
-
-                  {/* Submit Button */}
-                  <button
-                    type="submit"
-                    disabled={isLoading}
-                    onClick={(e) => {
-                      console.log('🔥 Button clicked!');
-                      handleSubmit(e);
-                    }}
-                    className={`w-full py-4 px-6 rounded-xl font-medium text-white transition-all duration-300 transform ${
-                      isLoading
-                        ? 'bg-gray-500/50 cursor-not-allowed'
-                        : 'bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 hover:scale-105 hover:shadow-2xl focus:outline-none focus:ring-2 focus:ring-purple-500 focus:ring-offset-2 focus:ring-offset-transparent'
-                    }`}
-                  >
-                    {isLoading ? (
-                      <div className="flex items-center justify-center gap-3">
-                        <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>
-                        <span>Creating your account...</span>
-                      </div>
-                    ) : (
-                      <div className="flex items-center justify-center gap-2">
-                        <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
-                          <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
-                        </svg>
-                        Create Account
-                      </div>
-                    )}
-                  </button>
-
-                  {/* Login Link */}
-                  <div className="text-center pt-4 border-t border-white/10">
-                    <p className="text-white/60 text-sm">
-                      Already have an account?{' '}
-                      <Link 
-                        to="/login" 
-                        className="text-purple-300 hover:text-white font-medium transition-colors duration-300 hover:underline"
-                      >
-                        Sign in here
-                      </Link>
-                    </p>
-                  </div>
-
-                  {/* Social Login Options */}
-                  <div className="space-y-4">
-                    <div className="relative">
-                      <div className="absolute inset-0 flex items-center">
-                        <div className="w-full border-t border-white/10"></div>
-                      </div>
-                      <div className="relative flex justify-center text-sm">
-                        <span className="px-4 bg-white/5 text-white/60 rounded-lg">or continue with</span>
-                      </div>
-                    </div>
-
-                    <div className="grid grid-cols-2 gap-3">
-                      <button
-                        type="button"
-                        className="flex items-center justify-center gap-2 py-3 px-4 bg-white/10 hover:bg-white/20 border border-white/20 rounded-xl text-white/80 hover:text-white transition-all duration-300 hover:scale-105"
-                      >
-                        <svg className="w-5 h-5" viewBox="0 0 24 24" fill="currentColor">
-                          <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/>
-                          <path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/>
-                          <path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" fill="#FBBC05"/>
-                          <path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/>
-                        </svg>
-                        Google
-                      </button>
-
-                      <button
-                        type="button"
-                        className="flex items-center justify-center gap-2 py-3 px-4 bg-blue-500/20 hover:bg-blue-500/30 border border-blue-400/30 rounded-xl text-blue-200 hover:text-white transition-all duration-300 hover:scale-105"
-                      >
-                        <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
-                          <path d="M11.944 0A12 12 0 0 0 0 12a12 12 0 0 0 12 12 12 12 0 0 0 12-12A12 12 0 0 0 12 0a12 12 0 0 0-.056 0zm4.962 7.224c.1-.002.321.023.465.14a.506.506 0 0 1 .171.325c.016.093.036.306.02.472-.18 1.898-.962 6.502-.962 6.502-.454 1.766-1.352 2.056-1.352 2.056-.766.078-.934-.671-.934-.671L12.77 14.58l-1.398-2.05s-.115-.166-.115-.23c0-.065.105-.136.105-.136l8.184-5.529s.175-.115.233-.175c.058-.06.02-.123-.089-.123-.109 0-.233.089-.233.089L8.15 11.897l-2.173-.69s-.33-.115-.33-.38c0-.266.35-.398.35-.398L15.94 7.128s.287-.126.966-.126z"/>
-                        </svg>
-                        Telegram
-                      </button>
-                    </div>
-                  </div>
-                </form>
-
-                {/* Footer */}
-                <div className="text-center mt-6">
-                  <p className="text-white/40 text-xs">
-                    By creating an account, you agree to our{' '}
-                    <a href="#" className="text-purple-300 hover:text-white transition-colors">Terms of Service</a>
-                    {' '}and{' '}
-                    <a href="#" className="text-purple-300 hover:text-white transition-colors">Privacy Policy</a>
-                  </p>
                 </div>
               </div>
-            </div>
+
+              {/* Duplicate Error */}
+              {errors.duplicate && (
+                <div className="bg-red-500/10 border border-red-400/30 rounded-xl p-4">
+                  <div className="flex items-center gap-2 text-red-300">
+                    <svg className="w-5 h-5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+                      <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
+                    </svg>
+                    <div>
+                      <p className="text-sm font-medium">{errors.duplicate}</p>
+                      <div className="mt-2 flex gap-2">
+                        <Link
+                          to="/login"
+                          className="text-xs text-blue-300 hover:text-blue-200 underline"
+                        >
+                          Login instead
+                        </Link>
+                        <button
+                          type="button"
+                          onClick={handleClearForm}
+                          className="text-xs text-purple-300 hover:text-purple-200 underline"
+                        >
+                          Try with different details
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              {/* General Errors */}
+              {(errors.auth || errors.submit) && !errors.duplicate && (
+                <div className="bg-red-500/10 border border-red-400/30 rounded-xl p-4">
+                  <div className="flex items-center gap-2 text-red-300">
+                    <svg className="w-5 h-5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+                      <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
+                    </svg>
+                    <p className="text-sm">{errors.auth || errors.submit}</p>
+                  </div>
+                </div>
+              )}
+
+              {/* Submit Button */}
+              <button
+                type="submit"
+                disabled={isLoading || successMessage}
+                className={`w-full py-4 px-6 rounded-xl font-medium text-white transition-all duration-300 ${
+                  isLoading || successMessage
+                    ? 'bg-white/20 cursor-not-allowed'
+                    : 'bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 transform hover:scale-[1.02] active:scale-[0.98] shadow-lg hover:shadow-xl'
+                }`}
+              >
+                {isLoading ? (
+                  <div className="flex items-center justify-center gap-2">
+                    <svg className="w-5 h-5 animate-spin" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                    </svg>
+                    Creating Account...
+                  </div>
+                ) : successMessage ? (
+                  <div className="flex items-center justify-center gap-2">
+                    <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+                      <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                    </svg>
+                    Success!
+                  </div>
+                ) : (
+                  <div className="flex items-center justify-center gap-2">
+                    <svg className="w-5 w-5" fill="currentColor" viewBox="0 0 20 20">
+                      <path fillRule="evenodd" d="M10 3a1 1 0 011 1v5h5a1 1 0 110 2h-5v5a1 1 0 11-2 0v-5H4a1 1 0 110-2h5V4a1 1 0 011-1z" clipRule="evenodd" />
+                    </svg>
+                    Create Account
+                  </div>
+                )}
+              </button>
+
+              {/* Login Link */}
+              <div className="text-center">
+                <p className="text-white/60 text-sm">
+                  Already have an account?{' '}
+                  <Link
+                    to="/login"
+                    className="text-purple-300 hover:text-purple-200 font-medium transition-colors"
+                  >
+                    Sign in here
+                  </Link>
+                </p>
+              </div>
+            </form>
+
+            {/* Debug Info (Development Only) */}
+            {process.env.NODE_ENV === 'development' && (
+              <div className="mt-8 p-4 bg-black/20 rounded-xl border border-white/10">
+                <details className="text-white/60 text-xs">
+                  <summary className="cursor-pointer text-white/80">Debug Info</summary>
+                  <pre className="mt-2 overflow-auto">
+                    {JSON.stringify({ formData, errors }, null, 2)}
+                  </pre>
+                </details>
+              </div>
+            )}
           </div>
         </div>
       </div>
-
-      {/* Custom CSS for animations */}
-      <style jsx>{`
-        .animation-delay-2000 {
-          animation-delay: 2s;
-        }
-        .animation-delay-4000 {
-          animation-delay: 4s;
-        }
-        @keyframes float {
-          0%, 100% { transform: translateY(0px); }
-          50% { transform: translateY(-20px); }
-        }
-        .animate-float {
-          animation: float 6s ease-in-out infinite;
-        }
-      `}</style>
     </div>
   );
 };
