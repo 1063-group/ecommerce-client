@@ -9,7 +9,7 @@ function App() {
 
   return (
     <>
-      <Link to="/" className='btn btn-primary btn-soft'>Login</Link>
+      {/* <Link to="/" className='btn btn-primary btn-soft'>Login</Link> */}
       {
         Outlet && <Outlet />
       }
