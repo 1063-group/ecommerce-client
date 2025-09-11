@@ -17,7 +17,7 @@ import Login from './pages/Login.jsx';
 import TelegramCallback from './pages/TelegramCallback.jsx';
 import UserProfile from './pages/Profile.jsx';
 import VerifyAccount from './pages/verfiyPage.jsx';
-import Dashboard from './pages/Dashboard.jsx';
+import Home from './pages/Home.jsx';
 import VerifyGuard from './guard/VerifyGuard.jsx';
 
 const router = createBrowserRouter([
@@ -32,7 +32,7 @@ const router = createBrowserRouter([
       {
         path: "/",
         element: <VerifyGuard>
-          <Dashboard />
+          <Home />
         </VerifyGuard>,
       },
 
