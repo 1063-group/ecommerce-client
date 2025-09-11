@@ -31,11 +31,11 @@ const VerifyAccount = () => {
   }, [timeLeft]);
 
   // Redirect if no verification data
-  useEffect(() => {
-    if (!userId) {
-      navigate('/register');
-    }
-  }, [userId, navigate]);
+  // useEffect(() => {
+  //   if (!userId) {
+  //     navigate('/register');
+  //   }
+  // }, [userId, navigate]);
 
   // Format time display
   const formatTime = (seconds) => {

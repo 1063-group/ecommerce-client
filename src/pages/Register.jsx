@@ -21,6 +21,7 @@ const Register = () => {
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [successMessage, setSuccessMessage] = useState('');
 
+
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
@@ -256,6 +257,7 @@ const Register = () => {
       if (response.ok) {
         console.log('✅ Registration successful!');
         setSuccessMessage('Registration successful! Redirecting to verification...');
+        dispatch(register(data.user));
         
         // Navigate to verification page with user data
         setTimeout(() => {

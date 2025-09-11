@@ -17,6 +17,8 @@ import Login from './pages/Login.jsx';
 import TelegramCallback from './pages/TelegramCallback.jsx';
 import UserProfile from './pages/Profile.jsx';
 import VerifyAccount from './pages/verfiyPage.jsx';
+import Dashboard from './pages/Dashboard.jsx';
+import VerifyGuard from './guard/VerifyGuard.jsx';
 
 const router = createBrowserRouter([
   {
@@ -29,14 +31,23 @@ const router = createBrowserRouter([
     children: [
       {
         path: "/",
-        element: <UserProfile />,
+        element: <VerifyGuard>
+          <Dashboard />
+        </VerifyGuard>,
       },
+
       {
-        path: "/verify-account",
-        element: <VerifyAccount />
+        path: "/profile",
+        element: <UserProfile />,
       }
     ],
     errorElement: <div>Page not found!</div>,
+  },
+  {
+    path: "/verify-account",
+    element: <PrivateRouter>
+      <VerifyAccount />
+    </PrivateRouter>
   },
   {
     path: "/login",
