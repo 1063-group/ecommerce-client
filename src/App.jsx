@@ -1,16 +1,22 @@
-// src/App.jsx
-import { Outlet, Link } from "react-router-dom";
+import { useState } from 'react'
+import reactLogo from './assets/react.svg'
+import viteLogo from '/vite.svg'
+import './App.css'
+import { Link, Outlet } from 'react-router-dom'
+import Header from './components/layouts/Header'
+import Footer from './components/layouts/Footer'
+function App() {
+  const [count, setCount] = useState(0)
 
 export default function App() {
   return (
-    <div className="min-h-screen flex flex-col">
-      {/* Navbar */}
-      <header className="w-full bg-white shadow-md sticky top-0 z-50">
-        <div className="max-w-7xl mx-auto flex items-center justify-between px-6 py-4">
-          {/* Logo */}
-          <Link to="/" className="text-2xl font-bold text-green-600">
-            Cartsy
-          </Link>
+    <>
+      <Header />
+      <Outlet />
+      <Footer />
+    </>
+  )
+}
 
           {/* Search Bar */}
           <div className="flex-1 mx-6">
