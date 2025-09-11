@@ -19,27 +19,25 @@ import UserProfile from './pages/Profile.jsx';
 import VerifyAccount from './pages/verfiyPage.jsx';
 import Dashboard from './pages/Dashboard.jsx';
 import VerifyGuard from './guard/VerifyGuard.jsx';
+import Home from './pages/Home.jsx';
+import FilteredProducts from './pages/FilteredProducts.jsx';
+import SingleProducts from './pages/SingleProducts.jsx';
 
 const router = createBrowserRouter([
   {
-    path: "/",
+    path: "/profile",
     element: (
       <PrivateRouter>
-        <App />
+        <VerifyGuard>
+          <UserProfile />
+        </VerifyGuard>
       </PrivateRouter>
     ),
     children: [
       {
-        path: "/",
-        element: <VerifyGuard>
-          <Dashboard />
-        </VerifyGuard>,
+        path: "/profile/me",
+        element: "",
       },
-
-      {
-        path: "/profile",
-        element: <UserProfile />,
-      }
     ],
     errorElement: <div>Page not found!</div>,
   },
@@ -58,6 +56,24 @@ const router = createBrowserRouter([
     element: <Register />,
   },
   { path: '/telegram/callback', element: <TelegramCallback /> },
+  {
+    path: "/",
+    element: <App />,
+    children: [
+      {
+        path: "/",
+        element: <Home />
+      },
+      {
+        path: "/categories/:category",
+        element: <FilteredProducts />
+      },
+      {
+        path: "/products/:id",
+        element: <SingleProducts />
+      }
+    ]
+  },
   {
     path: "*", // Catch-all route for 404
     element: (
