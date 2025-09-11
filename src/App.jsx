@@ -3,15 +3,16 @@ import reactLogo from './assets/react.svg'
 import viteLogo from '/vite.svg'
 import './App.css'
 import { Link, Outlet } from 'react-router-dom'
-import Dashboard from './pages/Dashboard'
-
+import Header from './components/layouts/Header'
+import Footer from './components/layouts/Footer'
 function App() {
   const [count, setCount] = useState(0)
 
   return (
     <>
-     <Outlet  />
-      <Dashboard />
+      <Header />
+      <Outlet />
+      <Footer />
     </>
   )
 }

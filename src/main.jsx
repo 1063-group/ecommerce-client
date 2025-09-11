@@ -19,6 +19,9 @@ import UserProfile from './pages/Profile.jsx';
 import VerifyAccount from './pages/verfiyPage.jsx';
 import Dashboard from './pages/Dashboard.jsx';
 import VerifyGuard from './guard/VerifyGuard.jsx';
+import Home from './pages/Home.jsx';
+import FilteredProducts from './pages/FilteredProducts.jsx';
+import SingleProducts from './pages/SingleProducts.jsx';
 
 const router = createBrowserRouter([
   {
@@ -32,14 +35,20 @@ const router = createBrowserRouter([
     ),
     children: [
       {
-        path: "me",   // ✅ nisbiy path
-        element: <div>My profile info</div>,
+        path: "/profile/me",
+        element: "",
       },
     ],
     errorElement: <div>Page not found!</div>,
   }
   , {  
     errorElement: <div>Page not found!</div>,
+  },
+  {
+    path: "/verify-account",
+    element: <PrivateRouter>
+      <VerifyAccount />
+    </PrivateRouter>
   },
   {
     path: "/verify-account",
@@ -58,7 +67,21 @@ const router = createBrowserRouter([
   { path: '/telegram/callback', element: <TelegramCallback /> },
   {
     path: "/",
-    element: <App />
+    element: <App />,
+    children: [
+      {
+        path: "/",
+        element: <Home />
+      },
+      {
+        path: "/categories/:category",
+        element: <FilteredProducts />
+      },
+      {
+        path: "/products/:id",
+        element: <SingleProducts />
+      }
+    ]
   },
   {
     path: "*", // Catch-all route for 404
