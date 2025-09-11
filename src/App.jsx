@@ -3,16 +3,15 @@ import reactLogo from './assets/react.svg'
 import viteLogo from '/vite.svg'
 import './App.css'
 import { Link, Outlet } from 'react-router-dom'
+import Dashboard from './pages/Dashboard'
 
 function App() {
   const [count, setCount] = useState(0)
 
   return (
     <>
-      <Link to="/" className='btn btn-primary btn-soft'>Login</Link>
-      {
-        Outlet && <Outlet />
-      }
+     <Outlet  />
+      <Dashboard />
     </>
   )
 }

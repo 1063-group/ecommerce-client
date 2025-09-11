@@ -17,26 +17,35 @@ import Login from './pages/Login.jsx';
 import TelegramCallback from './pages/TelegramCallback.jsx';
 import UserProfile from './pages/Profile.jsx';
 import VerifyAccount from './pages/verfiyPage.jsx';
+import Dashboard from './pages/Dashboard.jsx';
+import VerifyGuard from './guard/VerifyGuard.jsx';
 
 const router = createBrowserRouter([
   {
-    path: "/",
+    path: "/profile",
     element: (
       <PrivateRouter>
-        <App />
+        <VerifyGuard>
+          <UserProfile />
+        </VerifyGuard>
       </PrivateRouter>
     ),
     children: [
       {
-        path: "/",
-        element: <UserProfile />,
+        path: "me",   // ✅ nisbiy path
+        element: <div>My profile info</div>,
       },
-      {
-        path: "/verify-account",
-        element: <VerifyAccount />
-      }
     ],
     errorElement: <div>Page not found!</div>,
+  }
+  , {  
+    errorElement: <div>Page not found!</div>,
+  },
+  {
+    path: "/verify-account",
+    element: <PrivateRouter>
+      <VerifyAccount />
+    </PrivateRouter>
   },
   {
     path: "/login",
@@ -47,6 +56,10 @@ const router = createBrowserRouter([
     element: <Register />,
   },
   { path: '/telegram/callback', element: <TelegramCallback /> },
+  {
+    path: "/",
+    element: <App />
+  },
   {
     path: "*", // Catch-all route for 404
     element: (
