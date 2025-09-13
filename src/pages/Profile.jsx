@@ -437,7 +437,6 @@ const UserProfile = () => {
               </div>
             </div>
 
-            {/* Quick Actions */}
             <div className="bg-white rounded-3xl shadow-xl p-6">
               <h3 className="text-xl font-bold text-gray-900 mb-4 flex items-center">
                 <i className="fas fa-bolt mr-3 text-yellow-600"></i>

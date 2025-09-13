@@ -22,7 +22,8 @@ import VerifyGuard from './guard/VerifyGuard.jsx';
 import Home from './pages/Home.jsx';
 import FilteredProducts from './pages/FilteredProducts.jsx';
 import SingleProducts from './pages/SingleProducts.jsx';
-
+import DiscountCard from './components/ui/cards/DiscountCard.jsx';
+import Swiperbanner from './components/ui/promotions/SwiperBanner.jsx';
 const router = createBrowserRouter([
   {
     path: "/profile",
@@ -80,6 +81,14 @@ const router = createBrowserRouter([
       {
         path: "/products/:id",
         element: <SingleProducts />
+      },
+      {
+        path: "/swiperbanner",
+        element: <Swiperbanner />
+      },
+      {
+        path: "/discountCard",
+        element: <DiscountCard />
       }
     ]
   },

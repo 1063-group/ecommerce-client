@@ -1,6 +1,6 @@
 import React from 'react'
 
-const PromotionBanner = () => {
+const ColProductCard = () => {
   return (
     <div>
       
@@ -8,4 +8,4 @@ const PromotionBanner = () => {
   )
 }
 
-export default PromotionBanner
+export default ColProductCard
