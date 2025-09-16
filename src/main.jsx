@@ -2,6 +2,7 @@ import { StrictMode } from 'react'
 import { createRoot } from 'react-dom/client'
 import './index.css'
 import App from './App.jsx'
+import PromotionBanner from "./components/PromotionBanner";
 
 import { Provider } from "react-redux";
 import { store, persistor } from "./redux/store";
@@ -43,9 +44,11 @@ const router = createBrowserRouter([
   },
   {
     path: "/verify-account",
-    element: <PrivateRouter>
-      <VerifyAccount />
-    </PrivateRouter>
+    element: (
+      <PrivateRouter>
+        <VerifyAccount />
+      </PrivateRouter>
+    )
   },
   {
     path: "/login",
@@ -62,7 +65,12 @@ const router = createBrowserRouter([
     children: [
       {
         path: "/",
-        element: <Home />
+        element: (
+          <>
+            <Home />
+            <PromotionBanner />   {/* 🔥 Баннер добавлен */}
+          </>
+        )
       },
       {
         path: "/categories/:category",
@@ -75,7 +83,7 @@ const router = createBrowserRouter([
     ]
   },
   {
-    path: "*", // Catch-all route for 404
+    path: "*",
     element: (
       <div className="min-h-screen flex items-center justify-center bg-gray-50">
         <div className="text-center">
@@ -91,7 +99,7 @@ const router = createBrowserRouter([
     ),
   }
 ], {
-  basename: "/" // Production uchun basename
+  basename: "/"
 });
 
 createRoot(document.getElementById('root')).render(
@@ -107,6 +115,3 @@ createRoot(document.getElementById('root')).render(
     </Provider>
   </StrictMode>
 )
-
-// REDUX GLOBAL STATE 
-// REDUX STATE => LOCALSTORAGE
