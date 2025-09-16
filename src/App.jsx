@@ -5,14 +5,16 @@ import './App.css'
 import { Link, Outlet } from 'react-router-dom'
 import Header from './components/layouts/Header'
 import Footer from './components/layouts/Footer'
+import Navbar from './components/shared/Navbar'
 function App() {
   const [count, setCount] = useState(0)
 
   return (
     <>
-      <Header />
+      {/* <Header />
       <Outlet />
-      <Footer />
+      <Footer /> */}
+      <Navbar/>
     </>
   )
 }
