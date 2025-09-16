@@ -7,6 +7,7 @@ import {
   BarChart2,
   Menu,
 } from "lucide-react";
+import { Link } from "react-router-dom";
 
 const navItems = [
   { id: 1, label: "Сравнение", icon: BarChart2 },
@@ -33,12 +34,13 @@ export default function Navbar() {
     setIsMobileMenu(false);
   };
 
+
   return (
     <div onClick={handleOutsideClick} className="bg-gray-800 min-h-screen">
       <nav className="bg-gray-800 shadow-md px-4 sm:px-6 py-4">
         <div className="flex items-center justify-between max-w-7xl mx-auto">
           <div className="flex items-center gap-4">
-            <span className="text-2xl font-bold text-red-600">olcha</span>
+            <Link to="/"><span className="text-2xl font-bold text-primary">MarsShop</span></Link>
 
             <div className="relative hidden sm:block">
               <button
@@ -60,7 +62,7 @@ export default function Navbar() {
                   <ul className="py-2 bg-gray-800 rounded-xl">
                     {catalogItems.map((item, idx) => (
                       <li key={idx}>
-                        <a className="block px-4 py-2 text-sm hover:bg-red-500 transition-colors cursor-pointer">
+                        <a className="block px-4 py-2 text-sm hover:bg-primary transition-colors cursor-pointer">
                           {item}
                         </a>
                       </li>
@@ -79,7 +81,7 @@ export default function Navbar() {
                 placeholder="Поиск по каталогу"
                 className="flex-1 px-4 py-2 rounded-l-lg focus:outline-none shadow-sm"
               />
-              <button className="px-4 py-2 bg-red-600 hover:bg-red-700 text-white rounded-r-lg transition-colors">
+              <button className="px-4 py-2 bg-primary hover:bg-primary/60 text-white rounded-r-lg transition-colors">
                 <Search size={18} />
               </button>
             </div>
@@ -92,7 +94,7 @@ export default function Navbar() {
               return (
                 <button
                   key={item.id}
-                  className="relative flex flex-col items-center text-sm text-white hover:text-red-500 transition-colors p-2"
+                  className="relative flex flex-col items-center text-sm hover:text-primary transition-colors p-2"
                   onClick={() => {
                     if (item.label === "Корзина") setCartCount(cartCount + 1);
                   }}
@@ -101,7 +103,7 @@ export default function Navbar() {
                   <span className="mt-1">{item.label}</span>
 
                   {item.badge && cartCount > 0 && (
-                    <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full px-1.5 py-0.5 min-w-[20px] text-center">
+                    <span className="absolute -top-1 -right-1 bg-primary  text-xs rounded-full px-1.5 py-0.5 min-w-[20px] text-center">
                       {cartCount}
                     </span>
                   )}
@@ -109,88 +111,10 @@ export default function Navbar() {
               );
             })}
           </div>
-
-
-          <button
-            className="sm:hidden p-2 text-white hover:bg-gray-700 rounded-lg transition-colors"
-            onClick={(e) => {
-              e.stopPropagation();
-              setIsMobileMenu(!isMobileMenu);
-            }}
-          >
-            <Menu size={22} />
-          </button>
         </div>
 
 
-        {isMobileMenu && (
-          <div
-            className="sm:hidden mt-3 space-y-3 border-t border-gray-700 pt-3"
-            onClick={(e) => e.stopPropagation()}
-          >
-            <div>
-              <button
-                className="w-full px-4 py-2 border border-gray-600 rounded-lg text-sm text-white hover:bg-gray-700 transition-colors flex items-center gap-2 justify-start"
-                onClick={(e) => {
-                  e.stopPropagation();
-                  setIsCatalogOpen(!isCatalogOpen);
-                }}
-              >
-                <Menu size={18} />
-                <span>Каталог</span>
-              </button>
-              {isCatalogOpen && (
-                <div className="mt-2 bg-white border rounded-lg shadow-lg">
-                  <ul className="py-2">
-                    {catalogItems.map((item, idx) => (
-                      <li key={idx}>
-                        <a className="block px-4 py-2 text-sm hover:bg-red-100 transition-colors cursor-pointer">
-                          {item}
-                        </a>
-                      </li>
-                    ))}
-                  </ul>
-                </div>
-              )}
-            </div>
-
-            <div>
-              <div className="flex w-full">
-                <input
-                  type="text"
-                  placeholder="Поиск по каталогу"
-                  className="flex-1 px-4 py-2 rounded-l-lg focus:outline-none bg-white"
-                />
-                <button className="px-4 py-2 bg-red-600 hover:bg-red-700 text-white rounded-r-lg transition-colors">
-                  <Search size={18} />
-                </button>
-              </div>
-            </div>
-
-            <div className="grid grid-cols-4 gap-4">
-              {navItems.map((item) => {
-                const Icon = item.icon;
-                return (
-                  <button
-                    key={item.id}
-                    className="relative flex flex-col items-center text-sm text-white hover:text-red-500 transition-colors p-2"
-                    onClick={() => {
-                      if (item.label === "Корзина") setCartCount(cartCount + 1);
-                    }}
-                  >
-                    <Icon size={20} />
-                    <span className="mt-1 text-xs">{item.label}</span>
-                    {item.badge && cartCount > 0 && (
-                      <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full px-1.5 py-0.5 min-w-[18px] text-center">
-                        {cartCount}
-                      </span>
-                    )}
-                  </button>
-                );
-              })}
-            </div>
-          </div>
-        )}
+        
       </nav>
     </div>
   );
