@@ -13,7 +13,6 @@ const Home = () => {
   return (
     <>
       <div>
-        <ColProductCard />
       </div>
     </>
   )

@@ -10,5 +10,6 @@ export default function App() {
       <Header />
       <Outlet />
       <Footer />
+      {/* <Navbar/> */}
     </>
 )}

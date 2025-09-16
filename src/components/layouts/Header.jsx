@@ -7,7 +7,7 @@ const Header = () => {
   return (
     <header>
       <InfoBar />
-      {/* <Navbar/> */}
+      <Navbar/>
       <SubNavbar />
     </header>
   )
