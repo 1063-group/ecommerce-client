@@ -1,13 +1,13 @@
 import React from 'react'
+import InfoBar from '../shared/Infobar'
+import SubNavbar from '../shared/SubNavbar'
 
 const Header = () => {
   return (
-    <div>
-        {/* infobar */}
-        {/* Navbar */}
-        {/* SubNavbar */}
-        <p>HEADER</p>
-    </div>
+    <header>
+      <InfoBar />
+      <SubNavbar />
+    </header>
   )
 }
 
