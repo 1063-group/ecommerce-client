@@ -6,6 +6,7 @@ const Header = () => {
   return (
     <header>
       <InfoBar />
+      
       <SubNavbar />
     </header>
   )

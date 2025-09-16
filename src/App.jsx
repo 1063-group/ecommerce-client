@@ -11,7 +11,4 @@ export default function App() {
       <Outlet />
       <Footer />
     </>
-  )
-}
-
-
+)}
