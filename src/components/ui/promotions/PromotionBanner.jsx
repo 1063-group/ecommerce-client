@@ -4,7 +4,7 @@ import Container from '../../shared/Container'
 const PromotionBanner = ({ img }) => {
   return (
     <Container>
-      <div className="my-5 overflow-hidden">
+      <div className="my-5 overflow-hidden rounded-2xl">
         <img
           src={img || "https://via.placeholder.com/1200x300?text=Promotion+Banner+3"}
           alt="Banner 3"
