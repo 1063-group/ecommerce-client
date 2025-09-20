@@ -31,6 +31,7 @@ const Home = () => {
   return (
     <>
       <main>
+        {/* Main Products */}
         <section className='py-20'>
           <Container>
             {
@@ -57,8 +58,9 @@ const Home = () => {
           </Container>
         </section>
         <RowProductCard />
+
         <ProductCard />
-        <PromotionBanner />
+        <PromotionBanner img={'https://olcha.uz/image/1440x302/homePage/cdn_1/2025-07-16/DvAmWwCXU8V2EDK0d3bFFo7YbIpfPT8euXbpAkSWU6PxaThfpP4GeGHfrLJN.jpg'} />
       </main>
     </>
   )
