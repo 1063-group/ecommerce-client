@@ -1,12 +1,36 @@
-import React from "react";
+import React, { useState, useEffect } from 'react';
 import { FaHeart } from "react-icons/fa";
 import { FaRegHeart } from "react-icons/fa";
 import { BiBarChart } from "react-icons/bi";
 import { FiShoppingCart } from "react-icons/fi";
-const ColProductCard = () => {
+
+const ColProductCard = (cards) => {
+  const [Loading, setLoading] = useState([]);
+   const [Products, setProducts] = useState([]);
+
+  const fetchProducts = async () => {
+    const token = localStorage.getItem('token') || '';
+    try {
+      const res = await fetch("https://dummyjson.com/products", {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      if (!res.ok) throw new Error('Failed to fetch Products');
+      const data = await res.json();
+      setProducts(Array.isArray(data) ? data : data.data || []);
+    } catch (err) {
+      console.error('Ошибка категорий:', err);
+      toast.error(err.message || 'Failed to fetch Products');
+    }
+  };
+  useEffect(() => {
+    fetchProducts();
+  }, []);
   return (
     <div className="flex  items-center justify-center">
-      <div className="flex flex-col bg-base-100  min-w-[220px] rounded-xl m-5">
+{
+  Loading ? (
+Products.map((prod, index) => (
+        <div className="flex flex-col bg-base-100  min-w-[220px] rounded-xl m-5">
         <div className="photo  rounded-xl bg-base-300 p-3 ">
           <div className="flex flex-col gap-2  items-end ">
             <div className="border-none">
@@ -56,18 +80,31 @@ const ColProductCard = () => {
               <p className="text-lg">Беспроводные наушники</p>
               <p className="text-lg ">AirPods 3 Pro</p>
             </div>
-           <div className="flex flex-col "> 
-             <p className="price text-lg font-bold max-w-[130px]">2 150 000 сум</p>
-             <p className=" bg-warning/60 text-sm rounded max-w-[140px] p-1 font-medium"> 259 000 сум x12мес</p>
-           </div>
-
+            <div className="flex flex-col ">
+              <p className="price text-lg font-bold max-w-[130px]">
+                2 150 000 сум
+              </p>
+              <p className=" bg-warning/60 text-sm rounded max-w-[140px] p-1 font-medium">
+                {" "}
+                259 000 сум x12мес
+              </p>
+            </div>
           </div>
           <div className="buy flex justify-between items-center">
-            <button className="px-3 py-3 border border-3 text-2xl text-primary rounded-xl "><FiShoppingCart /></button>
-            <button className="text-xl text-secondary border border-3 rounded-xl px-7 py-2 ">В рассрочку</button>
+            <button className="px-3 py-3 border border-3 text-2xl text-primary rounded-xl ">
+              <FiShoppingCart />
+            </button>
+            <button className="text-xl text-secondary border border-3 rounded-xl px-7 py-2 ">
+              В рассрочку
+            </button>
           </div>
         </div>
       </div>
+))
+  ) : (
+
+  )
+}
     </div>
   );
 };
