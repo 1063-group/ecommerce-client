@@ -5,11 +5,12 @@ import Navbar from '../shared/Navbar'
 
 const Header = () => {
   return (
-    <header>
+    <div>
       <InfoBar />
-      <Navbar/>
+      <Navbar />
       <SubNavbar />
-    </header>
+
+    </div>
   )
 }
 

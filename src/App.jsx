@@ -8,8 +8,10 @@ export default function App() {
   return (
     <>
       <Header />
-      <Outlet />
+      <main>
+        <Outlet />
+      </main>
       <Footer />
-      {/* <Navbar/> */}
     </>
-)}
+  )
+}

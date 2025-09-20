@@ -7,73 +7,71 @@ import { FiShoppingCart } from "react-icons/fi";
 
 const ColProductCard = ({ card }) => {
   return (
-    <div className="flex  items-center justify-center">
-      <div className="flex flex-col bg-base-100  min-w-[220px] rounded-xl m-5">
-        <div className="photo  rounded-xl bg-base-300 p-3 ">
-          <div className="flex flex-col gap-2  items-end ">
-            <div className="border-none">
-              <label className="btn btn-circle swap swap-rotate border-none bg-base-100">
-                {/* this hidden checkbox controls the state */}
-                <input type="checkbox" />
+    <div className="flex flex-col bg-base-100  min-w-[220px] rounded-xl">
+      <div className="photo  rounded-xl bg-base-300 relative">
+        <div className="flex flex-col gap-2  items-end absolute z-10 top-2 right-4">
+          <div className="border-none">
+            <label className="btn btn-circle swap swap-rotate border-none bg-base-100">
+              {/* this hidden checkbox controls the state */}
+              <input type="checkbox" />
 
-                {/* hamburger icon */}
-                <div className="swap-off fill-current text-2xl text-base-200 ">
-                  <FaRegHeart />
-                </div>
+              {/* hamburger icon */}
+              <div className="swap-off fill-current text-xl text-base-content ">
+                <FaRegHeart />
+              </div>
 
-                {/* close icon */}
-                <div className="swap-on fill-current text-2xl text-error">
-                  <FaHeart />
-                </div>
-              </label>
-            </div>
-            <div>
-              <label className="btn btn-circle swap swap-rotate border-none bg-base-100 ">
-                {/* this hidden checkbox controls the state */}
-                <input type="checkbox" />
-
-                {/* hamburger icon */}
-                <div className="swap-off fill-current text-base-200 text-2xl">
-                  <BiBarChart />
-                </div>
-
-                {/* close icon */}
-                <div className="swap-on fill-current text-base-neutral text-2xl">
-                  <BiBarChart />
-                </div>
-              </label>
-            </div>
+              {/* close icon */}
+              <div className="swap-on fill-current text-xl text-base-content">
+                <FaHeart />
+              </div>
+            </label>
           </div>
-          <div className=" ">
-            <img
-              src={card?.images[0] || "Нет картинки"}
-              alt={card?.title || "Нет Названия"}
-              className="rounded-xl max-w-[244px]"
-            />
+          <div>
+            <label className="btn btn-circle swap swap-rotate border-none bg-base-100 ">
+              {/* this hidden checkbox controls the state */}
+              <input type="checkbox" />
+
+              {/* hamburger icon */}
+              <div className="swap-off fill-current text-white text-2xl">
+                <BiBarChart />
+              </div>
+
+              {/* close icon */}
+              <div className="swap-on fill-current text-white text-2xl">
+                <BiBarChart />
+              </div>
+            </label>
           </div>
         </div>
-        <div className="flex bg-base-100 rounded-xl flex-col gap-[20px] p-4">
-          <div className="main flex flex-col gap-3">
-            <div>
-              <p className="text-lg">{card?.category || "Нет Категории"}</p>
-              <p className="text-lg ">{card?.title || "Нет Названия"}</p>
-            </div>
-            <div className="flex flex-col ">
-              <p className="price text-lg font-bold max-w-[130px]">{(card.price).toLocaleString("ru-RU", { style: "currency", currency: "UZS" })  || "Нет Цены"}</p>
+        <div className=" ">
+          <img
+            src={card?.images[0] || "Нет картинки"}
+            alt={card?.title || "Нет Названия"}
+            className="rounded-xl w-full"
+          />
+        </div>
+      </div>
+      <div className="flex bg-base-100 rounded-xl flex-col gap-[20px] p-2">
+        <div className="main flex flex-col gap-3">
+          <div className="info flex flex-col gap-1 h-[86px]">
+            <p className="text-lg">{card?.category || "Нет Категории"}</p>
+            <p className="text-lg ">{card?.title || "Нет Названия"}</p>
+          </div>
+          <div className="flex flex-col ">
+            <p className="price text-lg font-bold max-w-[130px]">{(card.price).toLocaleString("ru-RU", { style: "currency", currency: "UZS" }) || "Нет Цены"}</p>
 
-              <p className="bg-warning/60 text-sm rounded max-w-[140px] p-1 font-medium">
-                {card?.price
-                  ? (Math.floor(card.price / 12) ).toLocaleString("ru-RU") + " UZS x12 мес"
-                  : "Нет Цены"} 
-              </p>
-
-            </div>
+            <p className="bg-warning/60 text-sm rounded max-w-[140px] p-1 font-medium">
+              {card?.price
+                ? (Math.floor(card.price / 12)).toLocaleString("ru-RU") + " UZS x12 мес"
+                : "Нет Цены"}
+            </p>
 
           </div>
-          <div className="buy flex justify-between items-center">
-            <button className="px-3 py-3  border-3 text-2xl text-primary rounded-xl "><FiShoppingCart /></button>
-            <button className="text-xl text-secondary  border-3 rounded-xl px-7 py-2 ">В рассрочку</button>
-          </div>
+
+        </div>
+        <div className="buy flex justify-between items-center gap-2">
+          <button className="btn btn-outline btn-primary rounded-xl "><FiShoppingCart /></button>
+          <button className="btn btn-outline btn-secondary rounded-xl flex-1">В рассрочку</button>
         </div>
       </div>
     </div>
