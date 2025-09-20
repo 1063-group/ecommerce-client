@@ -1,3 +1,4 @@
+import { HeartIcon, ShoppingCartIcon } from "lucide-react";
 import { Link } from "react-router-dom";
 // import { HeartIcon, ShoppingCartIcon } from "@heroicons/react/24/outline";
 
@@ -10,21 +11,21 @@ export default function ProductCard({ product }) {
 
       <div className="flex justify-center items-center h-52 p-4">
         <img
-          src={product.image}
-          alt={product.title}
+          src={product?.image}
+          alt={product?.title}
           className="h-full object-contain"
         />
       </div>
       <div className="p-4 border-t">
         <h2 className="text-sm font-medium text-gray-800 line-clamp-2 min-h-[36px]">
-          {product.title}
+          {product?.title}
         </h2>
 
         <p className="text-lg font-bold text-black mt-2">
-          {product.price.toLocaleString()} so‘m
+          {product?.price.toLocaleString()} so‘m
         </p>
 
-        {product.installment && (
+        {product?.installment && (
           <p className="bg-yellow-300 inline-block px-2 py-1 rounded text-sm font-semibold mt-1">
             {product.installment.toLocaleString()} so‘m x 12 мес
           </p>

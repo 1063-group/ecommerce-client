@@ -26,7 +26,7 @@ const SubNavbar = ({ lang, onLangChange }) => {
   const handleSellerClick = () => navigate("/login");
 
   return (
-    <div className="bg-gray-100 text-gray-800 shadow-sm">
+    <div className="bg-base-300 text-base-content shadow-sm">
       <div className="container mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex flex-col xl:flex-row items-center justify-between py-3 sm:py-4 gap-3">
 
@@ -40,11 +40,11 @@ const SubNavbar = ({ lang, onLangChange }) => {
                     {item.text}
                   </div>
                 ) : (
-                  <div className="flex items-center gap-2 px-2 py-1 rounded-md hover:bg-gray-200 transition cursor-pointer">
+                  <div className="flex items-center gap-2 px-2 py-1 rounded-md hover:bg-base-200 transition cursor-pointer">
                     <item.icon className="w-4 h-4" />
                     <div className="flex flex-col">
                       <span className="text-sm font-medium">{item.text}</span>
-                      {item.special && <span className="text-xs text-gray-500">{item.special}</span>}
+                      {item.special && <span className="text-xs text-neutral-content">{item.special}</span>}
                     </div>
                   </div>
                 )}
@@ -55,18 +55,18 @@ const SubNavbar = ({ lang, onLangChange }) => {
           {/* Right Menu */}
           <div className="flex flex-wrap items-center gap-3 sm:gap-4">
             {/* Phone */}
-            <a href="tel:+998952100550" className="flex items-center gap-2 px-3 py-2 rounded-full hover:bg-gray-200 transition">
-              <Phone className="w-4 h-4 sm:w-5 sm:h-5 text-indigo-600" />
+            <a href="tel:+998952100550" className="flex items-center gap-2 px-3 py-2 rounded-full hover:bg-base-200 transition">
+              <Phone className="w-4 h-4 sm:w-5 sm:h-5 text-primary" />
               <div className="flex flex-col">
-                <span className="text-xs text-gray-500">Звоните сейчас</span>
-                <span className="font-bold text-gray-800">+998 (95) 210 05 50</span>
+                <span className="text-xs text-neutral-content">Звоните сейчас</span>
+                <span className="font-bold text-base-content">+998 (95) 210 05 50</span>
               </div>
             </a>
 
             {/* Seller Button */}
             <button
               onClick={handleSellerClick}
-              className="flex items-center gap-2 bg-indigo-600 text-white px-3 py-2 rounded-lg hover:bg-indigo-700 transition font-medium"
+              className="flex items-center gap-2 bg-primary text-white px-3 py-2 rounded-lg hover:bg-primary transition font-medium"
             >
               <ShoppingBag className="w-4 h-4" />
               Продавайте на ecommerce
@@ -76,19 +76,19 @@ const SubNavbar = ({ lang, onLangChange }) => {
             <div className="relative">
               <button
                 onClick={() => setIsLangDropdownOpen(!isLangDropdownOpen)}
-                className="flex items-center gap-1 border border-gray-300 rounded-lg px-3 py-1 text-sm hover:bg-gray-200 transition"
+                className="flex items-center gap-1 border border-base-100 h-full min-h-11 rounded-lg px-3 py-1 text-sm hover:bg-base-200 transition"
               >
                 <Globe className="w-4 h-4" /> {lang} 
                 <ChevronDown className={`w-3 h-3 transition-transform ${isLangDropdownOpen ? 'rotate-180' : ''}`} />
               </button>
               {isLangDropdownOpen && (
-                <div className="absolute right-0 mt-2 w-32 bg-white border border-gray-200 rounded-lg shadow-lg z-50 py-1">
+                <div className="absolute right-0 mt-2 w-32 bg-base-100 border border-base-300 rounded-lg shadow-lg z-50 py-1">
                   {["Ўзб", "O'z", "Рус"].map((l) => (
                     <button
                       key={l}
                       onClick={() => { onLangChange(l); setIsLangDropdownOpen(false); }}
-                      className={`w-full text-left px-4 py-2 text-sm transition hover:bg-indigo-50 ${
-                        lang === l ? "bg-indigo-600 text-white font-bold" : ""
+                      className={`w-full text-left px-4 py-2 text-sm transition hover:bg-primary ${
+                        lang === l ? "bg-indigo-600 text-primary font-bold" : ""
                       }`}
                     >
                       {l}
