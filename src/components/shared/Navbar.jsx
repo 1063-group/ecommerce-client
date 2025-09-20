@@ -6,14 +6,21 @@ import {
   Search,
   BarChart2,
   Menu,
+  ClosedCaption,
+  SquareXIcon,
 } from "lucide-react";
 import Container from "./Container";
+import { useEffect } from "react";
+import ProductCard from "../ui/cards/ProductCard";
+import ColProductCard from "../ui/cards/ColProductCard";
 
 export default function Navbar() {
   const [cartCount, setCartCount] = useState(0);
   const [isCatalogOpen, setIsCatalogOpen] = useState(false);
   const [isMobileMenu, setIsMobileMenu] = useState(false);
-
+  const [isSearchOpen, setIsSearchOpen] = useState(false);
+  const [searchValue, setSearchValue] = useState("");
+  const [popularProducts, setPopularProducts] = useState([])
   const navItems = [
     { id: 1, label: "Сравнение", icon: BarChart2 },
     { id: 2, label: "Избранные", icon: Heart },
@@ -34,11 +41,28 @@ export default function Navbar() {
     setIsMobileMenu(false);
   };
 
+  const getPopularProducts = async () => {
+    try {
+      const request = await fetch('https://dummyjson.com/products?limit=5')
+      const response = await request.json()
+      setPopularProducts(response.products)
+      console.log("popular products", response)
+    } catch (e) {
+      console.log("server error:", e)
+    } finally {
+
+    }
+  }
+
+  useEffect(() => {
+    getPopularProducts()
+  }, [])
+
   return (
     <div onClick={handleOutsideClick} className="bg-base-300">
       <nav className="bg-base-300 shadow-md py-4">
         <Container>
-          <div className="flex items-center justify-between">
+          <div className="flex  items-center justify-between">
             {/* Logo and Catalog */}
             <div className="flex items-center gap-4">
               <span className="text-2xl font-bold text-primary cursor-pointer">
@@ -82,6 +106,7 @@ export default function Navbar() {
                 <input
                   type="text"
                   placeholder="Поиск по каталогу"
+                  onFocus={() => setIsSearchOpen(true)}
                   className="flex-1 px-4 py-2 rounded-l-lg bg-base-100 text-base-content placeholder:text-base-content/60 focus:outline-none shadow-sm border border-base-300"
                 />
                 <button className="px-4 py-2 bg-primary hover:bg-primary/80 text-primary-content rounded-r-lg transition-colors border border-primary border-l-0">
@@ -196,6 +221,42 @@ export default function Navbar() {
             </div>
           </div>
         )}
+
+        {
+          isSearchOpen && (
+            <div className="fixed inset-0 bg-base-300/95 z-[9999] h-screen w-full">
+              <div className="container mx-auto border-b max-w-7xl py-10 flex">
+                <input
+                  type="text"
+                  placeholder="Поиск по каталогу"
+                  autoFocus={isSearchOpen && true}
+                  className="flex-1 px-4 py-2 w-full min-h-[55px] rounded-l-lg bg-base-200 text-base-content placeholder:text-base-content/60 focus:outline-none shadow-sm border border-base-300"
+                />
+                <button className="px-4 py-2  min-h-[55px] bg-primary hover:bg-primary/80 text-primary-content rounded-r-lg transition-colors border border-primary border-l-0">
+                  <Search size={18} />
+                </button>
+              </div>
+
+              <div className="max-w-7xl mx-auto container py-6">
+                <p className="font-bold text-3xl text-accent">Популярные товары</p>
+
+                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-6 mt-6">
+                  {
+                    popularProducts.map((product, index) => (
+                      <ColProductCard key={index} card={product} />
+                    ))
+                  }
+                </div>
+
+                <div className="absolute top-6 right-6">
+                  <button className="btn btn-soft bg-transparent border-transparent btn-circle btn-error">
+                    <SquareXIcon size={30} onClick={() => setIsSearchOpen(false)} />
+                  </button>
+                </div>
+              </div>
+            </div>
+          )
+        }
       </nav>
     </div>
   );
