@@ -1,22 +1,17 @@
-import { useState } from "react";
-import { Outlet } from "react-router-dom";
-import Header from "./components/layouts/Header";
-import Footer from "./components/layouts/Footer";
-import SubNavbar from "./components/shared/SubNavbar";
+import { useState } from 'react'
+import './App.css'
+import { Link, Outlet } from 'react-router-dom'
+import Header from './components/layouts/Header'
+import Footer from './components/layouts/Footer'
 
-function App() {
-  const [lang, setLang] = useState("Ўзб");
-
+export default function App() {
   return (
     <>
       <Header />
-      <SubNavbar lang={lang} onLangChange={setLang} />
-      <main className="min-h-screen">
+      <main>
         <Outlet />
       </main>
       <Footer />
     </>
-  );
+  )
 }
-
-export default App;
