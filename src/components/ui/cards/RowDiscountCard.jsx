@@ -8,20 +8,23 @@ import { Heart, BarChart } from "lucide-react";
  * A product discount card similar to e-commerce style (like your screenshot).
  * Built with Tailwind CSS + DaisyUI.
  */
-
+// Product
 export default function DiscountProductCard({
   title = "Redmi 13C (Бывший в употреблении)",
   oldPrice = "1 742 000 сум",
   newPrice = "1 428 440 сум",
   discount = "-18%",
   installment = "168 000 сум x 12 мес",
-  image = "https://i.imgur.com/dRZbJtU.png",
-}) {
+  image = "",
+})
+
+// return
+{
   return (
-    <div className="card w-full max-w-sm bg-base-100 border-2 border-error rounded-2xl overflow-hidden relative shadow-md">
+    <div className="card w-full max-w-sm bg-base-100 border-2 border-primary rounded-2xl overflow-hidden relative shadow-md">
       {/* Discount badge */}
       <div className="absolute top-2 left-2">
-        <div className="badge badge-error text-white font-semibold">{discount}</div>
+        <div className="badge badge-primary text-base-100 font-semibold">{discount}</div>
       </div>
 
       {/* Icons */}
@@ -48,10 +51,10 @@ export default function DiscountProductCard({
         {/* Product info */}
         <div className="flex-1 min-w-0">
           <h2 className="text-md font-medium line-clamp-2">{title}</h2>
-          <div className="text-sm line-through text-gray-400">{oldPrice}</div>
-          <div className="text-lg font-bold text-error">{newPrice}</div>
+          <div className="text-sm line-through text-base-">{oldPrice}</div>
+          <div className="text-lg font-bold text-primary">{newPrice}</div>
           <div className="mt-1">
-            <div className="badge badge-warning text-black font-medium whitespace-nowrap">
+            <div className="badge badge-primary text-natural font-medium whitespace-nowrap">
               {installment}
             </div>
           </div>
