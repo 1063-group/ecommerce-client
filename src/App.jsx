@@ -1,22 +1,22 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
-import './App.css'
-import { Link, Outlet } from 'react-router-dom'
-import Header from './components/layouts/Header'
-import Footer from './components/layouts/Footer'
-import InfoBar from './components/shared/Infobar'
-import SubNavbar from './components/shared/SubNavbar'
+import { useState } from "react";
+import { Outlet } from "react-router-dom";
+import Header from "./components/layouts/Header";
+import Footer from "./components/layouts/Footer";
+import SubNavbar from "./components/shared/SubNavbar";
+
 function App() {
-  const [count, setCount] = useState(0)
+  const [lang, setLang] = useState("Ўзб");
 
   return (
     <>
       <Header />
-      <Outlet />
+      <SubNavbar lang={lang} onLangChange={setLang} />
+      <main className="min-h-screen">
+        <Outlet />
+      </main>
       <Footer />
     </>
-  )
+  );
 }
 
-export default App
+export default App;
