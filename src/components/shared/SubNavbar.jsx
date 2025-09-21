@@ -102,14 +102,14 @@ const SubNavbar = ({ lang, onLangChange }) => {
               >
                 <Globe className="w-4 h-10" /> {lang}
                 <ChevronDown
-                  className={`w-3 h-3 transition-transform ${
+                  className={`w-3  transition-transform ${
                     isLangDropdownOpen ? "rotate-180" : ""
                   }`}
                 />
               </button>
               {isLangDropdownOpen && (
                 <div className="absolute  right-0 mt-2 w-32 bg-base-100 border border-base-200 rounded-lg shadow-lg z-50 py-1">
-                  {["Ўзб", "O'z", "Рус"].map((l) => (
+                  {["Ўзб    ", "O'z", "Рус"].map((l) => (
                     <button
                       key={l}
                       onClick={() => {

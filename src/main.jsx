@@ -4,7 +4,7 @@ import { createRoot } from "react-dom/client";
 import "./index.css";
 
 import { Provider } from "react-redux";
-import { store, persistor } from "./redux/store"; // если есть
+import { store, persistor } from "./redux/store"; // ✅ faqat shu bo‘lsin
 import { PersistGate } from "redux-persist/integration/react";
 
 import {
@@ -24,10 +24,11 @@ import Register from "./pages/Register.jsx";
 import TelegramCallback from "./pages/TelegramCallback.jsx";
 import FilteredProducts from "./pages/FilteredProducts.jsx";
 import SingleProducts from "./pages/SingleProducts.jsx";
+import Korzinka from "./pages/Korzinka.jsx";
+import Favorites from "./pages/Fovorites.jsx"; // ✅ nomi Fovorites, lekin path /favorites
 
 const router = createBrowserRouter(
   [
-    // layout для профиля — пример вложенности
     {
       path: "/profile",
       element: (
@@ -39,20 +40,17 @@ const router = createBrowserRouter(
       ),
       children: [
         {
-          index: true, // /profile  -> рендерит Home внутри UserProfile's Outlet
+          index: true,
           element: (
             <VerifyGuard>
               <Home />
             </VerifyGuard>
           ),
         },
-        // пример относительного дочернего пути:
-        // { path: "settings", element: <ProfileSettings /> }  // -> /profile/settings
       ],
       errorElement: <div>Profile page not found</div>,
     },
 
-    // verify-account (требует авторизации)
     {
       path: "/verify-account",
       element: (
@@ -66,18 +64,19 @@ const router = createBrowserRouter(
     { path: "/register", element: <Register /> },
     { path: "/telegram/callback", element: <TelegramCallback /> },
 
-    // Главный сайт с layout App
     {
       path: "/",
-      element: <App />, // App должен содержать <Outlet />
+      element: <App />, // App ichida <Outlet /> bo‘lishi kerak
       children: [
-        { index: true, element: <Home /> }, // "/"
-        { path: "categories/:category", element: <FilteredProducts /> }, // "/categories/.."
-        { path: "products/:id", element: <SingleProducts /> }, // "/products/.."
+        { index: true, element: <Home /> },
+        { path: "categories/:category", element: <FilteredProducts /> },
+        { path: "products/:id", element: <SingleProducts /> },
+
+        { path: "korzinka", element: <Korzinka /> },
+        { path: "favorites", element: <Favorites /> },
       ],
     },
 
-    // catch-all 404
     {
       path: "*",
       element: (
@@ -87,7 +86,9 @@ const router = createBrowserRouter(
             <h2 className="text-2xl font-semibold text-gray-600 mb-4">
               Page Not Found
             </h2>
-            <p className="text-gray-500 mb-8">The page you're looking for doesn't exist.</p>
+            <p className="text-gray-500 mb-8">
+              The page you're looking for doesn't exist.
+            </p>
             <a href="/" className="btn btn-primary">
               Back to Home
             </a>
