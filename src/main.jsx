@@ -25,6 +25,8 @@ import TelegramCallback from "./pages/TelegramCallback.jsx";
 import FilteredProducts from "./pages/FilteredProducts.jsx";
 import SingleProducts from "./pages/SingleProducts.jsx";
 
+// const SingleProducts = React.lazy(() => import("./pages/SingleProducts.jsx"));
+
 const router = createBrowserRouter(
   [
     // layout для профиля — пример вложенности

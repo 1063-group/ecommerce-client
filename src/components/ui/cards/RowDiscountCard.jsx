@@ -21,7 +21,7 @@ export default function DiscountProductCard({
 // return
 {
   return (
-    <div className="card w-full max-w-sm bg-base-100 border-2 border-primary rounded-2xl overflow-hidden relative shadow-md">
+    <div className="card w-full h-52  max-w-sm bg-base-100 border-2 border-primary rounded-2xl overflow-hidden relative shadow-md">
       {/* Discount badge */}
       <div className="absolute top-2 left-2">
         <div className="badge badge-primary text-base-100 font-semibold">{discount}</div>

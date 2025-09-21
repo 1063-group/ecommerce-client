@@ -33,40 +33,40 @@ const RowProductCard = () => {
                 </p>
               </div>
             </div>
-             <div className="flex flex-col gap-2  items-end ">
-            <div className="border-none">
-              <label className="btn btn-circle swap swap-rotate border-none bg-base-100">
-                {/* this hidden checkbox controls the state */}
-                <input type="checkbox" />
+            <div className="flex flex-col gap-2  items-end ">
+              <div className="border-none">
+                <label className="btn btn-circle swap swap-rotate border-none bg-base-100">
+                  {/* this hidden checkbox controls the state */}
+                  <input type="checkbox" />
 
-                {/* hamburger icon */}
-                <div className="swap-off fill-current text-2xl text-base-200 ">
-                  <FaRegHeart />
-                </div>
+                  {/* hamburger icon */}
+                  <div className="swap-off fill-current text-2xl text-base-200 ">
+                    <FaRegHeart />
+                  </div>
 
-                {/* close icon */}
-                <div className="swap-on fill-current text-2xl text-error">
-                  <FaHeart />
-                </div>
-              </label>
+                  {/* close icon */}
+                  <div className="swap-on fill-current text-2xl text-error">
+                    <FaHeart />
+                  </div>
+                </label>
+              </div>
+              <div>
+                <label className="btn btn-circle swap swap-rotate border-none bg-base-100 ">
+                  {/* this hidden checkbox controls the state */}
+                  <input type="checkbox" />
+
+                  {/* hamburger icon */}
+                  <div className="swap-off fill-current text-base-200 text-2xl">
+                    <BiBarChart />
+                  </div>
+
+                  {/* close icon */}
+                  <div className="swap-on fill-current text-base-neutral text-2xl">
+                    <BiBarChart />
+                  </div>
+                </label>
+              </div>
             </div>
-            <div>
-              <label className="btn btn-circle swap swap-rotate border-none bg-base-100 ">
-                {/* this hidden checkbox controls the state */}
-                <input type="checkbox" />
-
-                {/* hamburger icon */}
-                <div className="swap-off fill-current text-base-200 text-2xl">
-                  <BiBarChart />
-                </div>
-
-                {/* close icon */}
-                <div className="swap-on fill-current text-base-neutral text-2xl">
-                  <BiBarChart />
-                </div>
-              </label>
-            </div>
-          </div>
           </div>
 
           <div className="buy flex justify-between items-center">

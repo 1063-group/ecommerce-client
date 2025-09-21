@@ -8,6 +8,8 @@ import PromotionBanner from '../components/ui/promotions/PromotionBanner'
 import Container from '../components/shared/Container'
 import SkeletonCards from '../components/shared/SkeletonCards'
 import RowDiscauntCard from '../components/ui/cards/RowDiscountCard'
+import ColDiscauntCard from '../components/ui/cards/ColDiscountCard'
+
 const Home = () => {
   const [user, usetUser] = useState([])
   const [products, setProducts] = useState([])
@@ -32,6 +34,23 @@ const Home = () => {
   return (
     <>
       <main>
+        {/* Main Products */}
+        {/* smartphones cards */}
+        <section className='py-10'>
+          <Container>
+            <div className='bg-primary border border-primary rounded-2xl'>
+               <div className="flex items-center p-1">
+                  <div className='grid grid-cols-1 gap-5 p-7'>
+                    {[1, 2].map((item, index) => <RowDiscauntCard  key={index} />)}
+                 </div>
+                 <div className='flex justify-between gap-7 '>
+                   {[1, 2, 3, 4, 5].map((item, index) => <ColDiscauntCard  key={index} />)}
+                     </div>
+               </div>
+            </div>
+          </Container>
+        </section>
+        <PromotionBanner img={'https://olcha.uz/image/1440x302/homePage/cdn_1/2025-07-16/DvAmWwCXU8V2EDK0d3bFFo7YbIpfPT8euXbpAkSWU6PxaThfpP4GeGHfrLJN.jpg'} />
         <section className='py-20'>
           <Container>
             {
@@ -59,7 +78,6 @@ const Home = () => {
         </section>
         <RowProductCard />
         <ProductCard />
-        <RowDiscauntCard />
         <PromotionBanner />
       </main>
     </>

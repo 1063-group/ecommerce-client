@@ -78,7 +78,7 @@ const SubNavbar = ({ lang, onLangChange }) => {
             >
               <Phone className="w-4 h-4 sm:w-5 sm:h-5 text-primary" />
               <div className="flex flex-col">
-                <span className="text-xs text-neutral">Звоните сейчас</span>
+                <span className="text-xs ">Звоните сейчас</span>
                 <span className="font-bold text-base-content">
                   +998 (95) 210 05 50
                 </span>
