@@ -7,10 +7,12 @@ import {
   addToCart,
   clearCart,
 } from "../redux/slices/cartSlice";
-import { Trash2, ShoppingCart } from "lucide-react";
+import { Trash2, ShoppingCart, X } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 
 const Korzinka = () => {
   const dispatch = useDispatch();
+  const navigate = useNavigate();
   const cartItems = useSelector((state) => state.cart.cartItems);
 
   // Jami narx
@@ -20,8 +22,18 @@ const Korzinka = () => {
   );
 
   return (
-    <div className="max-w-6xl mx-auto px-4 py-10">
-      <h1 className="text-3xl font-bold mb-8 text-center">🛒 Mening Korzinkam</h1>
+    <div className="relative max-w-6xl mx-auto px-4 py-10">
+      {/* ❌ Chiqish tugmasi */}
+      <button
+        onClick={() => navigate("/")}
+        className="absolute top-6 right-6 p-2 rounded-full hover:bg-base-200"
+      >
+        <X size={28} />
+      </button>
+
+      <h1 className="text-3xl font-bold mb-8 text-center">
+        🛒 Mening Korzinkam
+      </h1>
 
       {/* Bo‘sh holat */}
       {cartItems.length === 0 ? (
@@ -79,7 +91,7 @@ const Korzinka = () => {
                   </span>
                   <button
                     onClick={() => dispatch(removeFromCart(item.id))}
-                    className="text-red-500 hover:text-red-700"
+                    className="text-error hover:text-error/80"
                   >
                     <Trash2 size={22} />
                   </button>
@@ -92,7 +104,9 @@ const Korzinka = () => {
           <div className="mt-10 flex items-center justify-between bg-base-100 p-6 rounded-xl shadow-lg">
             <div>
               <h2 className="text-lg font-semibold">Jami:</h2>
-              <p className="text-2xl font-bold">{total.toLocaleString()} so‘m</p>
+              <p className="text-2xl font-bold">
+                {total.toLocaleString()} so‘m
+              </p>
             </div>
             <div className="flex gap-4">
               <button
@@ -101,7 +115,7 @@ const Korzinka = () => {
               >
                 Tozalash
               </button>
-              <button className="px-6 py-2 bg-primary text-white rounded-lg hover:bg-primary/80">
+              <button className="px-6 py-2 bg-primary text-primary-content rounded-lg hover:bg-primary/80">
                 Buyurtma berish
               </button>
             </div>

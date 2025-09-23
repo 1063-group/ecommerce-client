@@ -1,20 +1,23 @@
-import React from "react";
-import { StrictMode } from "react";
+import React, { StrictMode } from "react";
 import { createRoot } from "react-dom/client";
 import "./index.css";
 
+// Redux
 import { Provider } from "react-redux";
-import { store, persistor } from "./redux/store"; // ✅ faqat shu bo‘lsin
+import { store, persistor } from "./redux/store"; 
 import { PersistGate } from "redux-persist/integration/react";
 
+// Router
 import {
   createBrowserRouter,
   RouterProvider,
 } from "react-router-dom";
 
+// Guards
 import PrivateRouter from "./guard/PrivateRouter.jsx";
 import VerifyGuard from "./guard/VerifyGuard.jsx";
 
+// Pages
 import App from "./App.jsx";
 import Home from "./pages/Home.jsx";
 import UserProfile from "./pages/Profile.jsx";
@@ -25,10 +28,14 @@ import TelegramCallback from "./pages/TelegramCallback.jsx";
 import FilteredProducts from "./pages/FilteredProducts.jsx";
 import SingleProducts from "./pages/SingleProducts.jsx";
 import Korzinka from "./pages/Korzinka.jsx";
-import Favorites from "./pages/Fovorites.jsx"; // ✅ nomi Fovorites, lekin path /favorites
+import Favorites from "./pages/Fovorites.jsx"; 
+
+// Toast
+import { Toaster } from "react-hot-toast";
 
 const router = createBrowserRouter(
   [
+    // 👤 Profile
     {
       path: "/profile",
       element: (
@@ -51,6 +58,7 @@ const router = createBrowserRouter(
       errorElement: <div>Profile page not found</div>,
     },
 
+    // ✅ Verify account
     {
       path: "/verify-account",
       element: (
@@ -60,23 +68,25 @@ const router = createBrowserRouter(
       ),
     },
 
+    // 🔑 Auth
     { path: "/login", element: <Login /> },
     { path: "/register", element: <Register /> },
     { path: "/telegram/callback", element: <TelegramCallback /> },
 
+    // 🏠 Main site
     {
       path: "/",
-      element: <App />, // App ichida <Outlet /> bo‘lishi kerak
+      element: <App />, // ichida <Outlet /> bo‘lishi shart
       children: [
         { index: true, element: <Home /> },
         { path: "categories/:category", element: <FilteredProducts /> },
         { path: "products/:id", element: <SingleProducts /> },
-
         { path: "korzinka", element: <Korzinka /> },
         { path: "favorites", element: <Favorites /> },
       ],
     },
 
+    // ❌ 404
     {
       path: "*",
       element: (
@@ -112,6 +122,8 @@ createRoot(document.getElementById("root")).render(
         persistor={persistor}
       >
         <RouterProvider router={router} />
+        {/* 🚀 Toast notification */}
+        <Toaster position="top-right" reverseOrder={false} />
       </PersistGate>
     </Provider>
   </StrictMode>

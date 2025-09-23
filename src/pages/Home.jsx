@@ -31,6 +31,14 @@ const Home = () => {
   return (
     <>
       <main>
+        {/* Main Products */}
+        {/* smartphones cards */}
+        <section className='py-10'>
+          <Container>
+            <div></div>
+          </Container>
+        </section>
+        <PromotionBanner img={'https://olcha.uz/image/1440x302/homePage/cdn_1/2025-07-16/DvAmWwCXU8V2EDK0d3bFFo7YbIpfPT8euXbpAkSWU6PxaThfpP4GeGHfrLJN.jpg'} />
         <section className='py-20'>
           <Container>
             {
@@ -56,9 +64,10 @@ const Home = () => {
             }
           </Container>
         </section>
-        <RowProductCard />
-        <ProductCard />
-        <PromotionBanner />
+
+
+        {/* <ProductCard /> */}
+        <PromotionBanner img={'https://olcha.uz/image/1440x302/homePage/cdn_1/2025-07-16/DvAmWwCXU8V2EDK0d3bFFo7YbIpfPT8euXbpAkSWU6PxaThfpP4GeGHfrLJN.jpg'} />
       </main>
     </>
   )
