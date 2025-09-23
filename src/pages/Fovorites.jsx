@@ -34,7 +34,7 @@ const Fovorites = () => {
       <h1 className="text-3xl font-bold mb-8 text-center">
          Мои Избранные
       </h1>
-
+{/* asjdnasjdnakjsn */}
       {/* Пустое состояние */}
       {favorites.length === 0 ? (
         <div className="flex flex-col items-center justify-center py-20 bg-base-200 rounded-2xl shadow-lg">

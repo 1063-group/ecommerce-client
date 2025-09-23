@@ -29,3 +29,4 @@ export const { addToFavorites, removeFromFavorites, clearFavorites } =
   favoritesSlice.actions;
 
 export default favoritesSlice.reducer;
+// ajsdnjkasndkjasn
