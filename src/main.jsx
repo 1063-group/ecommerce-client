@@ -1,128 +1,130 @@
-import { StrictMode } from 'react'
-import { createRoot } from 'react-dom/client'
-import './index.css'
-import App from './App.jsx'
+import React, { StrictMode } from "react";
+import { createRoot } from "react-dom/client";
+import "./index.css";
 
+// Redux
 import { Provider } from "react-redux";
-import { store, persistor } from "./redux/store";
+import { store, persistor } from "./redux/store"; 
 import { PersistGate } from "redux-persist/integration/react";
 
+// Router
 import {
   createBrowserRouter,
   RouterProvider,
 } from "react-router-dom";
-import PrivateRouter from './guard/PrivateRouter.jsx';
-import Register from './pages/Register.jsx';
-import Login from './pages/Login.jsx';
-import TelegramCallback from './pages/TelegramCallback.jsx';
-import UserProfile from './pages/Profile.jsx';
-import VerifyAccount from './pages/verfiyPage.jsx';
-import Dashboard from './pages/Dashboard.jsx';
-import VerifyGuard from './guard/VerifyGuard.jsx';
-import Home from './pages/Home.jsx';
-import FilteredProducts from './pages/FilteredProducts.jsx';
-import SingleProducts from './pages/SingleProducts.jsx';
-import Korzina from './pages/Korzina.jsx';
-import Compare from './pages/Compare.jsx';
-import Wishlist from './pages/Wishlist.jsx';
 
+// Guards
+import PrivateRouter from "./guard/PrivateRouter.jsx";
+import VerifyGuard from "./guard/VerifyGuard.jsx";
 
-const router = createBrowserRouter([
-  {
-    path: "/profile",
-    element: (
-      <PrivateRouter>
-        <VerifyGuard>
-          <UserProfile />
-        </VerifyGuard>
-      </PrivateRouter>
-    ),
-    children: [
-      {
-        path: "/profile/me",
-        element: "",
-      },
-    ],
-    errorElement: <div>Page not found!</div>,
-  },
-  {
-    path: "/verify-account",
-    element: <PrivateRouter>
-      <VerifyAccount />
-    </PrivateRouter>
-  },
-  {
-    path: "/login",
-    element: <Login />,
-  },
-  {
-    path: "/kozrina",
-    element: <Korzina />,
-  },
-  {
-    path: "/compare",
-    element: <Compare />,
-  },
-  {
-    path: "/wishlist",
-    element: <Wishlist />,
-  },
-  {
-    path: "/register",
-    element: <Register />,
-  },
-  { path: '/telegram/callback', element: <TelegramCallback /> },
-  {
-    path: "/",
-    element: <App />,
-    children: [
-      {
-        path: "/",
-        element: <Home />
-      },
-      {
-        path: "/categories/:category",
-        element: <FilteredProducts />
-      },
-      {
-        path: "/products/:id",
-        element: <SingleProducts />
-      }
-    ]
-  },
-  {
-    path: "*", // Catch-all route for 404
-    element: (
-      <div className="min-h-screen flex items-center justify-center bg-gray-50">
-        <div className="text-center">
-          <h1 className="text-6xl font-bold text-gray-300 mb-4">404</h1>
-          <h2 className="text-2xl font-semibold text-gray-600 mb-4">Page Not Found</h2>
-          <p className="text-gray-500 mb-8">The page you're looking for doesn't exist.</p>
-          <a href="/" className="btn btn-primary">
-            <i className="fas fa-home mr-2"></i>
-            Back to Home
-          </a>
+// Pages
+import App from "./App.jsx";
+import Home from "./pages/Home.jsx";
+import UserProfile from "./pages/Profile.jsx";
+import VerifyAccount from "./pages/verfiyPage.jsx";
+import Login from "./pages/Login.jsx";
+import Register from "./pages/Register.jsx";
+import TelegramCallback from "./pages/TelegramCallback.jsx";
+import FilteredProducts from "./pages/FilteredProducts.jsx";
+import SingleProducts from "./pages/SingleProducts.jsx";
+import Korzinka from "./pages/Korzinka.jsx";
+import Favorites from "./pages/Fovorites.jsx"; 
+
+// Toast
+import { Toaster } from "react-hot-toast";
+
+const router = createBrowserRouter(
+  [
+    // 👤 Profile
+    {
+      path: "/profile",
+      element: (
+        <PrivateRouter>
+          <VerifyGuard>
+            <UserProfile />
+          </VerifyGuard>
+        </PrivateRouter>
+      ),
+      children: [
+        {
+          index: true,
+          element: (
+            <VerifyGuard>
+              <Home />
+            </VerifyGuard>
+          ),
+        },
+      ],
+      errorElement: <div>Profile page not found</div>,
+    },
+
+    // ✅ Verify account
+    {
+      path: "/verify-account",
+      element: (
+        <PrivateRouter>
+          <VerifyAccount />
+        </PrivateRouter>
+      ),
+    },
+
+    // 🔑 Auth
+    { path: "/login", element: <Login /> },
+    { path: "/register", element: <Register /> },
+    { path: "/telegram/callback", element: <TelegramCallback /> },
+
+    // 🏠 Main site
+    {
+      path: "/",
+      element: <App />, // ichida <Outlet /> bo‘lishi shart
+      children: [
+        { index: true, element: <Home /> },
+        { path: "categories/:category", element: <FilteredProducts /> },
+        { path: "products/:id", element: <SingleProducts /> },
+        { path: "korzinka", element: <Korzinka /> },
+        { path: "favorites", element: <Favorites /> },
+      ],
+    },
+
+    // ❌ 404
+    {
+      path: "*",
+      element: (
+        <div className="min-h-screen flex items-center justify-center bg-gray-50">
+          <div className="text-center">
+            <h1 className="text-6xl font-bold text-gray-300 mb-4">404</h1>
+            <h2 className="text-2xl font-semibold text-gray-600 mb-4">
+              Page Not Found
+            </h2>
+            <p className="text-gray-500 mb-8">
+              The page you're looking for doesn't exist.
+            </p>
+            <a href="/" className="btn btn-primary">
+              Back to Home
+            </a>
+          </div>
         </div>
-      </div>
-    ),
-  }
-], {
-  basename: "/" // Production uchun basename
-});
+      ),
+    },
+  ],
+  { basename: "/" }
+);
 
-createRoot(document.getElementById('root')).render(
+createRoot(document.getElementById("root")).render(
   <StrictMode>
     <Provider store={store}>
-      <PersistGate loading={
-        <div className="min-h-screen flex items-center justify-center">
-          <div className="loading loading-spinner loading-lg"></div>
-        </div>
-      } persistor={persistor}>
+      <PersistGate
+        loading={
+          <div className="min-h-screen flex items-center justify-center">
+            <div className="loading loading-spinner loading-lg"></div>
+          </div>
+        }
+        persistor={persistor}
+      >
         <RouterProvider router={router} />
+        {/* 🚀 Toast notification */}
+        <Toaster position="top-right" reverseOrder={false} />
       </PersistGate>
     </Provider>
   </StrictMode>
-)
-
-// REDUX GLOBAL STATE 
-// REDUX STATE => LOCALSTORAGE
+);
