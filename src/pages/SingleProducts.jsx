@@ -66,7 +66,7 @@ export default function SingleProducts() {
 
   return (
     <div className="min-h-screen bg-base-200">
-      <div className="max-w-7xl mx-auto px-4 py-8">
+      <div className="max-w-[95%] mx-auto px-4 py-8">
         {/* Breadcrumb */}
         <nav className="flex items-center gap-2 text-sm mb-8">
           <span
@@ -85,7 +85,7 @@ export default function SingleProducts() {
 
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
           {/* Left Column - Images */}
-          <div className="lg:col-span-6">
+          <div className="lg:col-span-4">
             <div className="sticky top-8">
               <div className="card bg-base-100 shadow-xl mb-6 relative">
                 {/* Favorite & Share */}
@@ -144,7 +144,7 @@ export default function SingleProducts() {
           </div>
 
           {/* Middle Column - Product Details */}
-          <div className="lg:col-span-4 space-y-6">
+          <div className="lg:col-span-5 space-y-6">
             <div>
               <h1 className="text-3xl font-bold mb-2">{product.title}</h1>
               <div className="flex items-center gap-2 mb-3">
@@ -243,7 +243,7 @@ export default function SingleProducts() {
           </div>
 
           {/* Right Column - Purchase */}
-          <div className="lg:col-span-2">
+          <div className="lg:col-span-3">
             <div className="card bg-base-100 shadow-xl sticky top-8 p-6">
               <div className="mb-6">
                 <p className="text-3xl font-bold">

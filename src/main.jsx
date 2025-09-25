@@ -81,11 +81,11 @@ const router = createBrowserRouter(
       children: [
         { index: true, element: <Home /> },
         { path: "categories/:category", element: <FilteredProducts /> },
-        { path: "products/:id", element: <SingleProducts /> }, // ✅ Product detail
         { path: "korzinka", element: <Korzinka /> },
         { path: "favorites", element: <Favorites /> },
       ],
     },
+    { path: "products/:id", element: <SingleProducts /> }, // ✅ Product detail
 
     // ❌ 404
     {
