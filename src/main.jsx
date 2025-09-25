@@ -1,20 +1,23 @@
-import React from "react";
-import { StrictMode } from "react";
+import React, { StrictMode } from "react";
 import { createRoot } from "react-dom/client";
 import "./index.css";
 
+// Redux
 import { Provider } from "react-redux";
-import { store, persistor } from "./redux/store"; // если есть
+import { store, persistor } from "./redux/store"; 
 import { PersistGate } from "redux-persist/integration/react";
 
+// Router
 import {
   createBrowserRouter,
   RouterProvider,
 } from "react-router-dom";
 
+// Guards
 import PrivateRouter from "./guard/PrivateRouter.jsx";
 import VerifyGuard from "./guard/VerifyGuard.jsx";
 
+// Pages
 import App from "./App.jsx";
 import Home from "./pages/Home.jsx";
 import UserProfile from "./pages/Profile.jsx";
@@ -24,12 +27,15 @@ import Register from "./pages/Register.jsx";
 import TelegramCallback from "./pages/TelegramCallback.jsx";
 import FilteredProducts from "./pages/FilteredProducts.jsx";
 import SingleProducts from "./pages/SingleProducts.jsx";
+import Korzinka from "./pages/Korzinka.jsx";
+import Favorites from "./pages/Fovorites.jsx"; 
 
-// const SingleProducts = React.lazy(() => import("./pages/SingleProducts.jsx"));
+// Toast
+import { Toaster } from "react-hot-toast";
 
 const router = createBrowserRouter(
   [
-    // layout для профиля — пример вложенности
+    // 👤 Profile
     {
       path: "/profile",
       element: (
@@ -41,20 +47,18 @@ const router = createBrowserRouter(
       ),
       children: [
         {
-          index: true, // /profile  -> рендерит Home внутри UserProfile's Outlet
+          index: true,
           element: (
             <VerifyGuard>
               <Home />
             </VerifyGuard>
           ),
         },
-        // пример относительного дочернего пути:
-        // { path: "settings", element: <ProfileSettings /> }  // -> /profile/settings
       ],
       errorElement: <div>Profile page not found</div>,
     },
 
-    // verify-account (требует авторизации)
+    // ✅ Verify account
     {
       path: "/verify-account",
       element: (
@@ -64,22 +68,25 @@ const router = createBrowserRouter(
       ),
     },
 
+    // 🔑 Auth
     { path: "/login", element: <Login /> },
     { path: "/register", element: <Register /> },
     { path: "/telegram/callback", element: <TelegramCallback /> },
 
-    // Главный сайт с layout App
+    // 🏠 Main site
     {
       path: "/",
-      element: <App />, // App должен содержать <Outlet />
+      element: <App />, // ichida <Outlet /> bo‘lishi shart
       children: [
-        { index: true, element: <Home /> }, // "/"
-        { path: "categories/:category", element: <FilteredProducts /> }, // "/categories/.."
-        { path: "products/:id", element: <SingleProducts /> }, // "/products/.."
+        { index: true, element: <Home /> },
+        { path: "categories/:category", element: <FilteredProducts /> },
+        { path: "products/:id", element: <SingleProducts /> },
+        { path: "korzinka", element: <Korzinka /> },
+        { path: "favorites", element: <Favorites /> },
       ],
     },
 
-    // catch-all 404
+    // ❌ 404
     {
       path: "*",
       element: (
@@ -89,7 +96,9 @@ const router = createBrowserRouter(
             <h2 className="text-2xl font-semibold text-gray-600 mb-4">
               Page Not Found
             </h2>
-            <p className="text-gray-500 mb-8">The page you're looking for doesn't exist.</p>
+            <p className="text-gray-500 mb-8">
+              The page you're looking for doesn't exist.
+            </p>
             <a href="/" className="btn btn-primary">
               Back to Home
             </a>
@@ -113,6 +122,8 @@ createRoot(document.getElementById("root")).render(
         persistor={persistor}
       >
         <RouterProvider router={router} />
+        {/* 🚀 Toast notification */}
+        <Toaster position="top-right" reverseOrder={false} />
       </PersistGate>
     </Provider>
   </StrictMode>

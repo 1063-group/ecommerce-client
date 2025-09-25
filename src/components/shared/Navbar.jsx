@@ -14,17 +14,21 @@ import { useEffect } from "react";
 import ProductCard from "../ui/cards/ProductCard";
 import ColProductCard from "../ui/cards/ColProductCard";
 
+import { useNavigate } from "react-router-dom"; // ✅ qo‘shing
+
 export default function Navbar() {
+  const navigate = useNavigate(); // ✅ navigate ni ishga tushiramiz
   const [cartCount, setCartCount] = useState(0);
   const [isCatalogOpen, setIsCatalogOpen] = useState(false);
   const [isMobileMenu, setIsMobileMenu] = useState(false);
   const [isSearchOpen, setIsSearchOpen] = useState(false);
   const [searchValue, setSearchValue] = useState("");
-  const [popularProducts, setPopularProducts] = useState([])
+  const [popularProducts, setPopularProducts] = useState([]);
+
   const navItems = [
     { id: 1, label: "Сравнение", icon: BarChart2 },
-    { id: 2, label: "Избранные", icon: Heart },
-    { id: 3, label: "Корзина", icon: ShoppingCart, badge: true },
+    { id: 2, label: "Избранные", icon: Heart, path: "/favorites" },
+    { id: 3, label: "Корзина", icon: ShoppingCart, badge: true, path: "/korzinka" },
     { id: 4, label: "Войти", icon: User },
   ];
 
@@ -65,7 +69,10 @@ export default function Navbar() {
           <div className="flex  items-center justify-between">
             {/* Logo and Catalog */}
             <div className="flex items-center gap-4">
-              <span className="text-2xl font-bold text-primary cursor-pointer">
+              <span
+                className="text-2xl font-bold text-primary cursor-pointer"
+                onClick={() => navigate("/")}
+              >
                 MarsShop
               </span>
 
@@ -124,17 +131,14 @@ export default function Navbar() {
                     key={item.id}
                     className="relative flex flex-col items-center text-sm text-base-content hover:text-primary transition-colors p-2"
                     onClick={() => {
-                      if (item.label === "Корзина") setCartCount(cartCount + 1);
+                      if (item.path) navigate(item.path);
+
                     }}
                   >
                     <Icon size={20} />
                     <span className="mt-1">{item.label}</span>
 
-                    {item.badge && cartCount > 0 && (
-                      <span className="absolute -top-1 -right-1 bg-primary text-primary-content text-xs rounded-full px-1.5 py-0.5 min-w-[20px] text-center">
-                        {cartCount}
-                      </span>
-                    )}
+
                   </button>
                 );
               })}
@@ -204,7 +208,8 @@ export default function Navbar() {
                       key={item.id}
                       className="relative flex items-center justify-center gap-2 p-3 text-sm text-base-content hover:text-primary hover:bg-base-200 transition-colors rounded-lg"
                       onClick={() => {
-                        if (item.label === "Корзина") setCartCount(cartCount + 1);
+                        if (item.path) navigate(item.path);
+                        // if (item.label === "Корзина") setCartCount(cartCount + 1);
                       }}
                     >
                       <Icon size={18} />
