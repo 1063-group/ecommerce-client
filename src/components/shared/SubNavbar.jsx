@@ -78,7 +78,7 @@ const SubNavbar = ({ lang, onLangChange }) => {
             >
               <Phone className="w-4 h-4 sm:w-5 sm:h-5 text-primary" />
               <div className="flex flex-col">
-                <span className="text-xs text-neutral">Звоните сейчас</span>
+                <span className="text-xs text-neutral-content">Звоните сейчас</span>
                 <span className="font-bold text-base-content">
                   +998 (95) 210 05 50
                 </span>
@@ -100,16 +100,16 @@ const SubNavbar = ({ lang, onLangChange }) => {
                 onClick={() => setIsLangDropdownOpen(!isLangDropdownOpen)}
                 className="flex items-center gap-1 border border-base-300 rounded-lg px-3 py-1 text-sm hover:bg-base-200 transition"
               >
-                <Globe className="w-4 h-4" /> {lang}
+                <Globe className="w-4 h-10" /> {lang}
                 <ChevronDown
-                  className={`w-3 h-3 transition-transform ${
+                  className={`w-3  transition-transform ${
                     isLangDropdownOpen ? "rotate-180" : ""
                   }`}
                 />
               </button>
               {isLangDropdownOpen && (
-                <div className="absolute right-0 mt-2 w-32 bg-base-100 border border-base-200 rounded-lg shadow-lg z-50 py-1">
-                  {["Ўзб", "O'z", "Рус"].map((l) => (
+                <div className="absolute  right-0 mt-2 w-32 bg-base-100 border border-base-200 rounded-lg shadow-lg z-50 py-1">
+                  {["Ўзб    ", "O'z", "Рус"].map((l) => (
                     <button
                       key={l}
                       onClick={() => {

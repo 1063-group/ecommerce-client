@@ -23,7 +23,7 @@ const InfoBar = ({ onStartShopping }) => {
           <div className="flex items-center gap-2">
             <ShoppingBag className="w-5 h-5 sm:w-6 sm:h-6" />
             <div className="text-sm sm:text-lg font-semibold">
-              Предложение от <span className="font-bold">Ecommerce</span> – Всё дешевле
+              Предложение от <span className="font-bold text-accent">Ecommerce</span> – Всё дешевле
             </div>
           </div>
 

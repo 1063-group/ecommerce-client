@@ -20,8 +20,9 @@ export default function App() {
       </div>
       <main>
         <Outlet />
+       
       </main>
-      <Footer />
+      {/* <Footer /> */}
     </>
   );
 }

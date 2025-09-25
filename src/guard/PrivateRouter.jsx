@@ -17,7 +17,6 @@ const PrivateRouter = ({ children }) => {
     }
   }, [isAuth, navigate, location.pathname])
 
-  // Loading state ko'rsatish
   if (!isAuth) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gray-50">
