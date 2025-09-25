@@ -30,6 +30,7 @@ const Fovorites = () => {
       >
         <X size={28} />
       </button>
+      {/* ajkndjkasndkjasndkjnasd */}
 
       <h1 className="text-3xl font-bold mb-8 text-center">
          Мои Избранные

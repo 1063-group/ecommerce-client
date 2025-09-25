@@ -4,7 +4,7 @@ import "./index.css";
 
 // Redux
 import { Provider } from "react-redux";
-import { store, persistor } from "./redux/store"; 
+import { store, persistor } from "./redux/store";
 import { PersistGate } from "redux-persist/integration/react";
 
 // Router
@@ -28,11 +28,12 @@ import TelegramCallback from "./pages/TelegramCallback.jsx";
 import FilteredProducts from "./pages/FilteredProducts.jsx";
 import SingleProducts from "./pages/SingleProducts.jsx";
 import Korzinka from "./pages/Korzinka.jsx";
-import Favorites from "./pages/Fovorites.jsx"; 
+import Favorites from "./pages/Fovorites.jsx";
 
 // Toast
 import { Toaster } from "react-hot-toast";
 
+// Router config
 const router = createBrowserRouter(
   [
     // 👤 Profile
@@ -76,15 +77,15 @@ const router = createBrowserRouter(
     // 🏠 Main site
     {
       path: "/",
-      element: <App />, // ichida <Outlet /> bo‘lishi shart
+      element: <App />, // ⚠️ App.jsx ichida <Outlet /> bo‘lishi kerak
       children: [
         { index: true, element: <Home /> },
         { path: "categories/:category", element: <FilteredProducts /> },
-        { path: "products/:id", element: <SingleProducts /> },
         { path: "korzinka", element: <Korzinka /> },
         { path: "favorites", element: <Favorites /> },
       ],
     },
+    { path: "products/:id", element: <SingleProducts /> }, // ✅ Product detail
 
     // ❌ 404
     {
@@ -110,6 +111,7 @@ const router = createBrowserRouter(
   { basename: "/" }
 );
 
+// Render
 createRoot(document.getElementById("root")).render(
   <StrictMode>
     <Provider store={store}>
@@ -122,7 +124,6 @@ createRoot(document.getElementById("root")).render(
         persistor={persistor}
       >
         <RouterProvider router={router} />
-        {/* 🚀 Toast notification */}
         <Toaster position="top-right" reverseOrder={false} />
       </PersistGate>
     </Provider>

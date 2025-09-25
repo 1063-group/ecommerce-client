@@ -5,8 +5,9 @@ import { FaRegHeart } from "react-icons/fa";
 =======
 import React from "react";
 import { useDispatch } from "react-redux";
+import { Link } from "react-router-dom";
 import { addToCart } from "../../../redux/slices/cartSlice";
-import { addToFavorites, removeFromFavorites } from "../../../redux/slices/favoritesSlice"; // 👈 qo‘shildi
+import { addToFavorites, removeFromFavorites } from "../../../redux/slices/favoritesSlice";
 import toast from "react-hot-toast";
 
 import { FaHeart, FaRegHeart } from "react-icons/fa";
@@ -16,7 +17,7 @@ import { FiShoppingCart } from "react-icons/fi";
 
 const ColProductCard = ({ card }) => {
   const dispatch = useDispatch();
-  const [isFavorite, setIsFavorite] = React.useState(false); // 👈 state
+  const [isFavorite, setIsFavorite] = React.useState(false);
 
   const handleAddToCart = () => {
     dispatch(
@@ -33,7 +34,7 @@ const ColProductCard = ({ card }) => {
   const handleToggleFavorite = () => {
     if (isFavorite) {
       dispatch(removeFromFavorites(card.id));
-      toast.error(`${card.title} fovoritelardan o‘chirildi ❌`);
+      toast.error(`${card.title} favoritlardan o‘chirildi ❌`);
     } else {
       dispatch(
         addToFavorites({
@@ -43,19 +44,24 @@ const ColProductCard = ({ card }) => {
           image: card.images[0],
         })
       );
-      toast.success(`${card.title} fovoritelarga qo‘shildi ❤️`);
+      toast.success(`${card.title} favoritlarga qo‘shildi ❤️`);
     }
     setIsFavorite(!isFavorite);
   };
 
   return (
     <div className="flex flex-col bg-base-100 min-w-[220px] rounded-xl">
-      <div className="photo rounded-xl bg-base-300 relative">
+      {/* Product ustiga bosilganda SingleProduct sahifasiga o'tish */}
+      <Link to={`/products/${card.id}`} className="photo rounded-xl bg-base-300 relative">
         <div className="flex flex-col gap-2 items-end absolute z-10 top-2 right-4">
           {/* Like tugmasi */}
           <div className="border-none">
             <button
-              onClick={handleToggleFavorite}
+              type="button"
+              onClick={(e) => {
+                e.preventDefault();
+                handleToggleFavorite();
+              }}
               className="btn btn-circle border-none bg-base-100"
             >
               {isFavorite ? (
@@ -81,21 +87,22 @@ const ColProductCard = ({ card }) => {
         </div>
 
         {/* Product rasmi */}
-        <div>
-          <img
-            src={card?.images[0] || "Нет картинки"}
-            alt={card?.title || "Нет Названия"}
-            className="rounded-xl w-full"
-          />
-        </div>
-      </div>
+        <img
+          src={card?.images[0] || "Нет картинки"}
+          alt={card?.title || "Нет Названия"}
+          className="rounded-xl w-full"
+        />
+      </Link>
 
       {/* Pastki qism */}
       <div className="flex bg-base-100 rounded-xl flex-col gap-[20px] p-2">
         <div className="main flex flex-col gap-3">
           <div className="info flex flex-col gap-1 h-[86px]">
             <p className="text-lg">{card?.category || "Нет Категории"}</p>
-            <p className="text-lg">{card?.title || "Нет Названия"}</p>
+            {/* Nomi ham link bo‘lsin */}
+            <Link to={`/products/${card.id}`} className="text-lg hover:underline">
+              {card?.title || "Нет Названия"}
+            </Link>
           </div>
           <div className="flex flex-col">
             <p className="price text-lg font-bold max-w-[130px]">
