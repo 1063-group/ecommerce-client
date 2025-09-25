@@ -1,44 +1,48 @@
 import React, { useEffect, useState } from "react";
 
 const DiscountCard = () => {
-  // Boshlang‘ich vaqt (soat, minut, sekund)
-  const [time, setTime] = useState({
-    hours: 6,
-    minutes: 48,
-    seconds: 56,
-  });
+  const [time, setTime] = useState({ hours: 6, minutes: 48, seconds: 56 });
+  const [productImg, setProductImg] = useState("");
 
+  // Countdown
   useEffect(() => {
     const timer = setInterval(() => {
       setTime((prev) => {
         let { hours, minutes, seconds } = prev;
-
-        if (seconds > 0) {
-          seconds -= 1;
-        } else {
+        if (seconds > 0) seconds -= 1;
+        else {
           seconds = 59;
-          if (minutes > 0) {
-            minutes -= 1;
-          } else {
+          if (minutes > 0) minutes -= 1;
+          else {
             minutes = 59;
-            if (hours > 0) {
-              hours -= 1;
-            }
+            if (hours > 0) hours -= 1;
           }
         }
-
         return { hours, minutes, seconds };
       });
     }, 1000);
-
     return () => clearInterval(timer);
   }, []);
 
-  // Formatlash (masalan: 06, 07 ...)
+  // Random product image
+  useEffect(() => {
+    (async () => {
+      try {
+        const res = await fetch("https://dummyjson.com/products?limit=50");
+        const data = await res.json();
+        const random =
+          data.products[Math.floor(Math.random() * data.products.length)];
+        setProductImg(random.thumbnail || random.images?.[0]);
+      } catch (err) {
+        console.error("DiscountCard image fetch error:", err);
+      }
+    })();
+  }, []);
+
   const formatTime = (num) => String(num).padStart(2, "0");
 
   return (
-    <div className="w-1/4 border-2 border-primary h-87 rounded-xl flex flex-col justify-between">
+    <div className="w-1/4 border-2 border-primary rounded-xl flex flex-col justify-between overflow-hidden">
       <div className="flex justify-between items-center mb-4 p-4">
         <h2 className="font-bold text-lg">Товар дня</h2>
         <div className="flex gap-1 text-sm font-mono">
@@ -55,9 +59,14 @@ const DiscountCard = () => {
           </span>
         </div>
       </div>
-      <div className="items-center justify-center">
-          <img src="https://skyatransdermic.com/cdn/shop/articles/The_Future_of_Indian_Cosmetics_Industry.jpg?v=1722080297" alt="" className="h-70 min-w-80 rounded-b-[10px] relative bottom-3"/>
-      </div>
+
+      {productImg && (
+        <img
+          src={productImg}
+          alt="Discount product"
+          className="w-full aspect-square object-cover"
+        />
+      )}
     </div>
   );
 };
