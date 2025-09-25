@@ -7,6 +7,7 @@ import RowProductCard from '../components/ui/cards/RowProductCard'
 import PromotionBanner from '../components/ui/promotions/PromotionBanner'
 import Container from '../components/shared/Container'
 import SkeletonCards from '../components/shared/SkeletonCards'
+import CategorySwiper from '../components/ui/promotions/CategorySwiper'
 const Home = () => {
   const [user, usetUser] = useState([])
   const [products, setProducts] = useState([])
@@ -62,6 +63,7 @@ const Home = () => {
                 </div>
               )
             }
+            <CategorySwiper />
           </Container>
         </section>
 
