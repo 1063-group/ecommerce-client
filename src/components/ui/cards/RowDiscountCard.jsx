@@ -11,10 +11,8 @@ import { Heart, BarChart } from "lucide-react";
 // Product
 export default function DiscountProductCard({
   title = "Redmi 13C (Бывший в употреблении)",
-  oldPrice = "1 742 000 сум",
-  newPrice = "1 428 440 сум",
-  discount = "-18%",
-  installment = "168 000 сум x 12 мес",
+  price = 1000000,
+  discount = 18,
   image = "https://olcha.uz/image/220x220/products/cdn_1/supplier/stores/1/2025-09-18/wI0On5FHgzwkeHByFVL2VODCayL9v1LssoVJB8Uaq1ntjMj502S52AepywLi.jpg",
 })
 
@@ -24,7 +22,7 @@ export default function DiscountProductCard({
     <div className="card w-full min-w-[320px] flex-1 max-w-sm bg-base-100 border-2 border-primary rounded-2xl overflow-hidden relative shadow-md">
       {/* Discount badge */}
       <div className="absolute top-2 left-2">
-        <div className="badge badge-primary text-base-100 font-semibold">{discount}</div>
+        <div className="badge badge-primary text-base-100 font-semibold">-{discount}%</div>
       </div>
 
       {/* Icons */}
@@ -51,11 +49,12 @@ export default function DiscountProductCard({
         {/* Product info */}
         <div className="flex-1 min-w-0">
           <h2 className="text-md font-medium line-clamp-2">{title}</h2>
-          <div className="text-sm line-through text-base-">{oldPrice}</div>
-          <div className="text-lg font-bold text-primary">{newPrice}</div>
-          <div className="mt-1">
-            <div className="badge badge-primary text-xs text-natural font-medium whitespace-nowrap">
-              {installment}
+          <div className="text-base font-bold text-primary">{Number(price - (price / 100 * discount)).toLocaleString('Ru-ru')} <span className="text-xs">UZS</span></div>
+          <div className="text-xs line-through text-base-content/70">
+            {Number(price).toLocaleString('Ru-ru')} UZS</div>
+          <div className="mt-4">
+            <div className="badge badge-primary text-[11px] text-natural font-medium whitespace-nowrap">
+              {(price / 12).toFixed(2)} UZS x 12 месяц
             </div>
           </div>
         </div>
