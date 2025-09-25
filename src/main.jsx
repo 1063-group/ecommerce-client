@@ -101,6 +101,7 @@ const router = createBrowserRouter(
               The page you're looking for doesn't exist.
             </p>
             <a href="/" className="btn btn-primary">
+            {/* back to home navigate */}
               Back to Home
             </a>
           </div>
