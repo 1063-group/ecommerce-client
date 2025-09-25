@@ -22,6 +22,10 @@ import VerifyGuard from './guard/VerifyGuard.jsx';
 import Home from './pages/Home.jsx';
 import FilteredProducts from './pages/FilteredProducts.jsx';
 import SingleProducts from './pages/SingleProducts.jsx';
+import Korzina from './pages/Korzina.jsx';
+import Compare from './pages/Compare.jsx';
+import Wishlist from './pages/Wishlist.jsx';
+
 
 const router = createBrowserRouter([
   {
@@ -50,6 +54,18 @@ const router = createBrowserRouter([
   {
     path: "/login",
     element: <Login />,
+  },
+  {
+    path: "/kozrina",
+    element: <Korzina />,
+  },
+  {
+    path: "/compare",
+    element: <Compare />,
+  },
+  {
+    path: "/wishlist",
+    element: <Wishlist />,
   },
   {
     path: "/register",

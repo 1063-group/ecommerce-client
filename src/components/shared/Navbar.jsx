@@ -10,10 +10,10 @@ import {
 import { Link } from "react-router-dom";
 
 const navItems = [
-  { id: 1, label: "Сравнение", icon: BarChart2 },
-  { id: 2, label: "Избранные", icon: Heart },
-  { id: 3, label: "Корзина", icon: ShoppingCart, badge: true },
-  { id: 4, label: "Войти", icon: User },
+  { id: 1, path: "/compare" , label: "Сравнение", icon: BarChart2 },
+  { id: 2, path: "/wishlist", label: "Избранные", icon: Heart },
+  { id: 3, path: "/kozrina", label: "Корзина", icon: ShoppingCart, badge: true },
+  { id: 4, path: "/login", label: "Войти", icon: User },
 ];
 
 const catalogItems = [
@@ -36,15 +36,15 @@ export default function Navbar() {
 
 
   return (
-    <div onClick={handleOutsideClick} className="bg-gray-800 min-h-screen">
-      <nav className="bg-gray-800 shadow-md px-4 sm:px-6 py-4">
+    <div onClick={handleOutsideClick} className="bg-gray-800">
+      <nav className="bg-base-200 shadow-md px-4 sm:px-6 py-4">
         <div className="flex items-center justify-between max-w-7xl mx-auto">
           <div className="flex items-center gap-4">
             <Link to="/"><span className="text-2xl font-bold text-primary">MarsShop</span></Link>
 
             <div className="relative hidden sm:block">
               <button
-                className="px-4 py-2 border border-gray-600 rounded-lg text-sm text-white hover:bg-gray-700 transition-colors flex items-center gap-2"
+                className="px-4 py-2 border border-base-300 rounded-lg text-sm hover:bg-base-100 transition-colors flex items-center gap-2"
                 onClick={(e) => {
                   e.stopPropagation();
                   setIsCatalogOpen(!isCatalogOpen);
@@ -56,10 +56,10 @@ export default function Navbar() {
 
               {isCatalogOpen && (
                 <div
-                  className="absolute top-full mt-2 bg-white border rounded-xl shadow-lg w-52 z-50"
+                  className="absolute top-full mt-2 border rounded-xl shadow-lg w-52 z-50"
                   onClick={(e) => e.stopPropagation()}
                 >
-                  <ul className="py-2 bg-gray-800 rounded-xl">
+                  <ul className="py-2 bg-base-100 rounded-xl">
                     {catalogItems.map((item, idx) => (
                       <li key={idx}>
                         <a className="block px-4 py-2 text-sm hover:bg-primary transition-colors cursor-pointer">
@@ -81,7 +81,7 @@ export default function Navbar() {
                 placeholder="Поиск по каталогу"
                 className="flex-1 px-4 py-2 rounded-l-lg focus:outline-none shadow-sm"
               />
-              <button className="px-4 py-2 bg-primary hover:bg-primary/60 text-white rounded-r-lg transition-colors">
+              <button className="px-4 py-2 bg-primary hover:bg-primary/60  rounded-r-lg transition-colors">
                 <Search size={18} />
               </button>
             </div>
@@ -92,7 +92,7 @@ export default function Navbar() {
             {navItems.map((item) => {
               const Icon = item.icon;
               return (
-                <button
+                <Link to={item.path}
                   key={item.id}
                   className="relative flex flex-col items-center text-sm hover:text-primary transition-colors p-2"
                   onClick={() => {
@@ -107,7 +107,7 @@ export default function Navbar() {
                       {cartCount}
                     </span>
                   )}
-                </button>
+                </Link>
               );
             })}
           </div>
