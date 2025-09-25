@@ -38,8 +38,8 @@ const DiscountCard = () => {
   const formatTime = (num) => String(num).padStart(2, "0");
 
   return (
-    <div className="w-1/4 border-2 border-red-500 rounded-xl p-2 flex flex-col justify-between">
-      <div className="flex justify-between items-center mb-4">
+    <div className="w-1/4 border-2 border-primary h-87 rounded-xl flex flex-col justify-between">
+      <div className="flex justify-between items-center mb-4 p-4">
         <h2 className="font-bold text-lg">Товар дня</h2>
         <div className="flex gap-1 text-sm font-mono">
           <span className="px-1 py-0.5 border rounded">
@@ -55,8 +55,8 @@ const DiscountCard = () => {
           </span>
         </div>
       </div>
-      <div className="flex-1 flex items-center justify-center">
-        <img src="https://media.istockphoto.com/id/1829241109/photo/enjoying-a-brunch-together.jpg?s=612x612&w=0&k=20&c=9awLLRMBLeiYsrXrkgzkoscVU_3RoVwl_HA-OT-srjQ=" alt="" />
+      <div className="items-center justify-center">
+          <img src="https://skyatransdermic.com/cdn/shop/articles/The_Future_of_Indian_Cosmetics_Industry.jpg?v=1722080297" alt="" className="h-70 min-w-80 rounded-b-[10px] relative bottom-3"/>
       </div>
     </div>
   );
