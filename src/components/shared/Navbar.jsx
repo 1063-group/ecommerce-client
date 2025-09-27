@@ -10,31 +10,38 @@ import {
 } from "lucide-react";
 import Container from "./Container";
 import ColProductCard from "../ui/cards/ColProductCard";
-
-import { useNavigate } from "react-router-dom"; // ✅ qo‘shing
+import { useNavigate } from "react-router-dom";
 
 export default function Navbar() {
-  const navigate = useNavigate(); // ✅ navigate ni ishga tushiramiz
+  const navigate = useNavigate();
   const [cartCount, setCartCount] = useState(0);
   const [isCatalogOpen, setIsCatalogOpen] = useState(false);
   const [isMobileMenu, setIsMobileMenu] = useState(false);
   const [isSearchOpen, setIsSearchOpen] = useState(false);
   const [searchValue, setSearchValue] = useState("");
   const [popularProducts, setPopularProducts] = useState([]);
+  const [searchResults, setSearchResults] = useState([]);
+  const [categoryProducts, setCategoryProducts] = useState([]);
 
   const navItems = [
     { id: 1, label: "Сравнение", icon: BarChart2 },
     { id: 2, label: "Избранные", icon: Heart, path: "/favorites" },
-    { id: 3, label: "Корзина", icon: ShoppingCart, badge: true, path: "/korzinka" },
+    {
+      id: 3,
+      label: "Корзина",
+      icon: ShoppingCart,
+      badge: true,
+      path: "/korzinka",
+    },
     { id: 4, label: "Войти", icon: User },
   ];
 
   const catalogItems = [
-    "Телефоны",
-    "Ноутбуки",
-    "Бытовая техника",
-    "Одежда",
-    "Аксессуары",
+    { id: 1, label: "Телефоны", query: "smartphones" },
+    { id: 2, label: "Ноутбуки", query: "laptops" },
+    { id: 3, label: "Бытовая техника", query: "home-decoration" },
+    { id: 4, label: "Одежда", query: "mens-shirts" },
+    { id: 5, label: "Аксессуары", query: "womens-bags" },
   ];
 
   const handleOutsideClick = () => {
@@ -42,7 +49,6 @@ export default function Navbar() {
     setIsMobileMenu(false);
   };
 
-  // 🔹 boshlang‘ich 5 ta popular product
   const getPopularProducts = async () => {
     try {
       const request = await fetch("https://dummyjson.com/products?limit=5");
@@ -57,9 +63,26 @@ export default function Navbar() {
     getPopularProducts();
   }, []);
 
-  // 🔎 Enter bosilganda real API search
-  const handleSearchEnter = async (e) => {
-    if (e.key === "Enter" && searchValue.trim() !== "") {
+  const handleCategoryClick = async (query) => {
+    try {
+      const res = await fetch(
+        `https://dummyjson.com/products/category/${query}`
+      );
+      const data = await res.json();
+      setCategoryProducts(data.products || []);
+      setIsCatalogOpen(false);
+      setIsSearchOpen(true); // 🔹 overlay ochiladi va productlar ko‘rinadi
+    } catch (err) {
+      console.error("Category API error:", err);
+    }
+  };
+  // 🔎 Real-time search API chaqirish
+  useEffect(() => {
+    const fetchSearch = async () => {
+      if (searchValue.trim() === "") {
+        setSearchResults([]);
+        return;
+      }
       try {
         const res = await fetch(
           `https://dummyjson.com/products/search?q=${encodeURIComponent(
@@ -71,16 +94,21 @@ export default function Navbar() {
       } catch (err) {
         console.error("Search API error:", err);
       }
-    }
-  };
+    };
 
-  // Agar Enter bosilmasa, fallback sifatida popularProducts ni filter qilamiz
+    fetchSearch();
+  }, [searchValue]);
+
   const filteredProducts =
-    searchResults.length > 0
-      ? searchResults
-      : popularProducts.filter((product) =>
-          product.title.toLowerCase().includes(searchValue.toLowerCase())
-        );
+    searchValue.trim() !== ""
+      ? searchResults.length > 0
+        ? searchResults
+        : popularProducts.filter((product) =>
+            product.title.toLowerCase().includes(searchValue.toLowerCase())
+          )
+      : categoryProducts.length > 0
+      ? categoryProducts
+      : popularProducts;
 
   return (
     <div onClick={handleOutsideClick} className="bg-base-300">
@@ -114,11 +142,14 @@ export default function Navbar() {
                     onClick={(e) => e.stopPropagation()}
                   >
                     <ul className="py-2 bg-base-200 rounded-xl">
-                      {catalogItems.map((item, idx) => (
-                        <li key={idx}>
-                          <a className="block px-4 py-2 text-sm text-base-content hover:bg-primary hover:text-primary-content transition-colors cursor-pointer">
-                            {item}
-                          </a>
+                      {catalogItems.map((item) => (
+                        <li key={item.id}>
+                          <button
+                            onClick={() => handleCategoryClick(item.query)}
+                            className="w-full text-left block px-4 py-2 text-sm text-base-content hover:bg-primary hover:text-primary-content transition-colors cursor-pointer"
+                          >
+                            {item.label}
+                          </button>
                         </li>
                       ))}
                     </ul>
@@ -134,9 +165,10 @@ export default function Navbar() {
                   type="text"
                   placeholder="Поиск по каталогу"
                   value={searchValue}
-                  onChange={(e) => setSearchValue(e.target.value)}
-                  onFocus={() => setIsSearchOpen(true)}
-                  onKeyDown={handleSearchEnter} // ⬅️ Enter listener
+                  onChange={(e) => {
+                    setSearchValue(e.target.value);
+                    setIsSearchOpen(true);
+                  }}
                   className="flex-1 px-4 py-2 rounded-l-lg bg-base-100 text-base-content placeholder:text-base-content/60 focus:outline-none shadow-sm border border-base-300"
                 />
                 <button
@@ -158,13 +190,10 @@ export default function Navbar() {
                     className="relative flex flex-col items-center text-sm text-base-content hover:text-primary transition-colors p-2"
                     onClick={() => {
                       if (item.path) navigate(item.path);
-
                     }}
                   >
                     <Icon size={20} />
                     <span className="mt-1">{item.label}</span>
-
-
                   </button>
                 );
               })}
@@ -183,7 +212,6 @@ export default function Navbar() {
           </div>
         </Container>
 
-        {/* Mobile Menu */}
         {isMobileMenu && (
           <div className="sm:hidden mt-4 border-t border-base-content/20 pt-4">
             <div className="flex flex-col gap-4">
@@ -194,7 +222,6 @@ export default function Navbar() {
                   placeholder="Поиск по каталогу"
                   value={searchValue}
                   onChange={(e) => setSearchValue(e.target.value)}
-                  onKeyDown={handleSearchEnter}
                   className="flex-1 px-4 py-2 rounded-l-lg bg-base-100 text-base-content placeholder:text-base-content/60 focus:outline-none shadow-sm border border-base-300"
                 />
                 <button
@@ -241,7 +268,6 @@ export default function Navbar() {
                       className="relative flex items-center justify-center gap-2 p-3 text-sm text-base-content hover:text-primary hover:bg-base-200 transition-colors rounded-lg"
                       onClick={() => {
                         if (item.path) navigate(item.path);
-                        // if (item.label === "Корзина") setCartCount(cartCount + 1);
                       }}
                     >
                       <Icon size={18} />
@@ -269,12 +295,11 @@ export default function Navbar() {
                 autoFocus
                 value={searchValue}
                 onChange={(e) => setSearchValue(e.target.value)}
-                onKeyDown={handleSearchEnter}
                 className="flex-1 px-4 py-2 w-full min-h-[55px] rounded-l-lg bg-base-200 text-base-content placeholder:text-base-content/60 focus:outline-none shadow-sm border border-base-300"
               />
               <button
                 className="px-4 py-2 min-h-[55px] bg-primary hover:bg-primary/80 text-primary-content rounded-r-lg transition-colors border border-primary border-l-0"
-                onClick={handleSearchEnter}
+                onClick={() => setIsSearchOpen(true)}
               >
                 <Search size={18} />
               </button>

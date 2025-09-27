@@ -1,6 +1,3 @@
-<<<<<<< HEAD
-// Bilol
-=======
 // ColDiscountCard.jsx
 import React from "react"
 import { Heart, BarChart2, ShoppingCart } from "lucide-react"
@@ -61,4 +58,3 @@ export default function ColDiscountCard({
     </Link>
   )
 }
->>>>>>> 23c52c1ce1ea2134a2160dcb34711448821165e8
