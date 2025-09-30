@@ -99,7 +99,7 @@ const Home = () => {
         <PromotionBanner />
       </main>
     </>
-  )
-}
+  );
+};
 
-export default Home
+export default Home;

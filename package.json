@@ -26,6 +26,7 @@
     "react-router-dom": "^7.9.1",
     "redux-persist": "^6.0.0",
     "sort-by": "^1.2.0",
+    "swipe": "^1.7.7",
     "swiper": "^11.2.10",
     "tailwindcss": "^4.1.12"
   },
@@ -34,7 +35,7 @@
     "@types/react": "^19.1.9",
     "@types/react-dom": "^19.1.7",
     "@vitejs/plugin-react-swc": "^3.11.0",
-    "daisyui": "^5.0.50",
+    "daisyui": "^5.1.10",
     "eslint": "^9.32.0",
     "eslint-plugin-react-hooks": "^5.2.0",
     "eslint-plugin-react-refresh": "^0.4.20",
