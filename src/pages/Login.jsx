@@ -37,8 +37,8 @@ const currentConfig = isDevelopment ? CONFIG.development : CONFIG.production;
 
 // 🤖 Telegram
 const TELEGRAM_CONFIG = {
-  botUsername: 'SignUp_MarsBot',
-  botId: '6412343716',
+  botUsername: 'isroilbek_back_bot', // test bot
+  botId: '7538109815',
   widgetSrc: 'https://telegram.org/js/telegram-widget.js?22',
   domain: currentConfig.domain, // hostname only
 };

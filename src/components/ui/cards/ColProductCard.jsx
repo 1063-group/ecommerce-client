@@ -129,6 +129,7 @@ const ColProductCard = ({ card }) => {
           </button>
         </div>
       </div>
+
     </div>
   );
 };

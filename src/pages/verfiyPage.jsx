@@ -323,9 +323,7 @@ const VerifyAccount = () => {
               )}
             </div>
 
-            {/* Action Buttons */}
             <div className="space-y-4">
-              {/* Verify Button */}
               <button
                 onClick={handleVerify}
                 disabled={isLoading || verificationCode.join('').length !== 6}
