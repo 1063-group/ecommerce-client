@@ -63,8 +63,8 @@ const Home = () => {
                 <div className='max-w-[30%] flex flex-wrap flex-col justify-between'>
                   {smartphones.slice(0, 2).map((item, index) => <RowDiscauntCard key={index} title={item?.title} price={item?.price} discount={item?.discount} image={item?.thumbnail} />)}
                 </div>
-                <div className='flex items-center'>
-                  {[1, 2, 3, 4].map((item, index) => <ColDiscauntCard key={index} />)}
+                <div className='flex items-center flex-wrap h-[440px] overflow-y-hidden'>
+                  {smartphones.map((item, index) => <ColDiscauntCard key={index} title={item?.title} price={item?.price} discount={item?.discount} image={item?.thumbnail} />)}
                 </div>
               </div>
             </div>
