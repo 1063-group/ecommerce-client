@@ -14,6 +14,7 @@ const Home = () => {
   const [user, usetUser] = useState([])
   const [products, setProducts] = useState([])
   const [smartphones, setSmartphones] = useState([])
+  const [laptops, setLaptops] = useState([])
   const [loadingProducts, setLoadingProducts] = useState(true)
   console.log(import.meta.env.VITE_API_URL)
 
@@ -42,9 +43,24 @@ const Home = () => {
       setLoadingProducts(false)
     }
   }
+
+  const getLaptops = async () => {
+    try {
+      const request = await fetch(import.meta.env.VITE_API_URL + '/products/category/laptops')
+      const response = await request.json()
+      console.log("Laptops: ", response)
+      setLaptops(response.products)
+    } catch (e) {
+      console.log('server error:', e)
+    } finally {
+      setLoadingProducts(false)
+    }
+  }
+
   useEffect(() => {
     getProducts()
     getSmartPhones()
+    getLaptops()
   }, [])
   useEffect(() => {
     const a = products.filter(item => item.category === 'smartphones')
@@ -63,8 +79,8 @@ const Home = () => {
                 <div className='max-w-[30%] flex flex-wrap flex-col justify-between'>
                   {smartphones.slice(0, 2).map((item, index) => <RowDiscauntCard key={index} title={item?.title} price={item?.price} discount={item?.discount} image={item?.thumbnail} />)}
                 </div>
-                <div className='flex items-center'>
-                  {[1, 2, 3, 4].map((item, index) => <ColDiscauntCard key={index} />)}
+                <div className='flex items-center justify-center w-full'>
+                  {laptops.slice(0, 4).map((item, index) => <ColDiscauntCard key={index} title={item?.title} price={item?.price} discount={item?.discount} image={item?.thumbnail} />)}
                 </div>
               </div>
             </div>
