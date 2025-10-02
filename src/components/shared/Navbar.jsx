@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import {
   ShoppingCart,
   User,
@@ -6,30 +6,25 @@ import {
   Search,
   BarChart2,
   Menu,
-  ClosedCaption,
   SquareXIcon,
 } from "lucide-react";
 import Container from "./Container";
-import { useEffect } from "react";
-import ProductCard from "../ui/cards/ProductCard";
 import ColProductCard from "../ui/cards/ColProductCard";
-
-import { useNavigate } from "react-router-dom"; // ✅ qo‘shing
+import { useNavigate } from "react-router-dom";
 
 export default function Navbar() {
-  const navigate = useNavigate(); // ✅ navigate ni ishga tushiramiz
+  const navigate = useNavigate();
   const [cartCount, setCartCount] = useState(0);
   const [isCatalogOpen, setIsCatalogOpen] = useState(false);
   const [isMobileMenu, setIsMobileMenu] = useState(false);
   const [isSearchOpen, setIsSearchOpen] = useState(false);
-  const [searchValue, setSearchValue] = useState("");
   const [popularProducts, setPopularProducts] = useState([]);
 
   const navItems = [
     { id: 1, label: "Сравнение", icon: BarChart2 },
     { id: 2, label: "Избранные", icon: Heart, path: "/favorites" },
     { id: 3, label: "Корзина", icon: ShoppingCart, badge: true, path: "/korzinka" },
-    { id: 4, label: "Войти", icon: User },
+    { id: 4, label: "Войти", icon: User , path: "/login"},
   ];
 
   const catalogItems = [
@@ -47,26 +42,23 @@ export default function Navbar() {
 
   const getPopularProducts = async () => {
     try {
-      const request = await fetch('https://dummyjson.com/products?limit=5')
-      const response = await request.json()
-      setPopularProducts(response.products)
-      console.log("popular products", response)
+      const request = await fetch("https://dummyjson.com/products?limit=5");
+      const response = await request.json();
+      setPopularProducts(response.products);
     } catch (e) {
-      console.log("server error:", e)
-    } finally {
-
+      console.log("server error:", e);
     }
-  }
+  };
 
   useEffect(() => {
-    getPopularProducts()
-  }, [])
+    getPopularProducts();
+  }, []);
 
   return (
     <div onClick={handleOutsideClick} className="bg-base-300">
-      <nav className="bg-base-300 shadow-md py-4">
+      <nav className="bg-base-300 shadow-md py-4 sticky top-0 z-50">
         <Container>
-          <div className="flex  items-center justify-between">
+          <div className="flex items-center justify-between">
             {/* Logo and Catalog */}
             <div className="flex items-center gap-4">
               <span
@@ -107,7 +99,7 @@ export default function Navbar() {
               </div>
             </div>
 
-            {/* Search Bar */}
+            {/* Desktop Search */}
             <div className="hidden md:flex flex-1 mx-6">
               <div className="flex w-full">
                 <input
@@ -122,7 +114,7 @@ export default function Navbar() {
               </div>
             </div>
 
-            {/* Desktop Navigation Items */}
+            {/* Desktop Nav Items */}
             <div className="hidden sm:flex items-center gap-6">
               {navItems.map((item) => {
                 const Icon = item.icon;
@@ -130,15 +122,15 @@ export default function Navbar() {
                   <button
                     key={item.id}
                     className="relative flex flex-col items-center text-sm text-base-content hover:text-primary transition-colors p-2"
-                    onClick={() => {
-                      if (item.path) navigate(item.path);
-
-                    }}
+                    onClick={() => item.path && navigate(item.path)}
                   >
                     <Icon size={20} />
                     <span className="mt-1">{item.label}</span>
-
-
+                    {item.badge && cartCount > 0 && (
+                      <span className="absolute -top-1 -right-1 bg-primary text-primary-content text-xs rounded-full px-1.5 py-0.5 min-w-[20px] text-center">
+                        {cartCount}
+                      </span>
+                    )}
                   </button>
                 );
               })}
@@ -207,10 +199,7 @@ export default function Navbar() {
                     <button
                       key={item.id}
                       className="relative flex items-center justify-center gap-2 p-3 text-sm text-base-content hover:text-primary hover:bg-base-200 transition-colors rounded-lg"
-                      onClick={() => {
-                        if (item.path) navigate(item.path);
-                        // if (item.label === "Корзина") setCartCount(cartCount + 1);
-                      }}
+                      onClick={() => item.path && navigate(item.path)}
                     >
                       <Icon size={18} />
                       <span>{item.label}</span>
@@ -227,41 +216,37 @@ export default function Navbar() {
           </div>
         )}
 
-        {
-          isSearchOpen && (
-            <div className="fixed inset-0 bg-base-300/95 z-[9999] h-screen w-full">
-              <div className="container mx-auto border-b max-w-7xl py-10 flex">
-                <input
-                  type="text"
-                  placeholder="Поиск по каталогу"
-                  autoFocus={isSearchOpen && true}
-                  className="flex-1 px-4 py-2 w-full min-h-[55px] rounded-l-lg bg-base-200 text-base-content placeholder:text-base-content/60 focus:outline-none shadow-sm border border-base-300"
-                />
-                <button className="px-4 py-2  min-h-[55px] bg-primary hover:bg-primary/80 text-primary-content rounded-r-lg transition-colors border border-primary border-l-0">
-                  <Search size={18} />
-                </button>
-              </div>
+        {/* Fullscreen Search Overlay */}
+        {isSearchOpen && (
+          <div className="fixed inset-0 bg-base-300/95 z-[9999] flex flex-col">
+            <div className="container mx-auto max-w-7xl py-10 flex gap-2">
+              <input
+                type="text"
+                placeholder="Поиск по каталогу"
+                autoFocus
+                className="flex-1 px-4 py-2 min-h-[55px] rounded-l-lg bg-base-200 text-base-content placeholder:text-base-content/60 focus:outline-none shadow-sm border border-base-300"
+              />
+              <button className="px-4 py-2 min-h-[55px] bg-primary hover:bg-primary/80 text-primary-content rounded-r-lg transition-colors border border-primary border-l-0">
+                <Search size={18} />
+              </button>
+              <button
+                className="btn btn-soft bg-transparent border-transparent btn-circle btn-error ml-2"
+                onClick={() => setIsSearchOpen(false)}
+              >
+                <SquareXIcon size={30} />
+              </button>
+            </div>
 
-              <div className="max-w-7xl mx-auto container py-6">
-                <p className="font-bold text-3xl text-accent">Популярные товары</p>
-
-                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-6 mt-6">
-                  {
-                    popularProducts.map((product, index) => (
-                      <ColProductCard key={index} card={product} />
-                    ))
-                  }
-                </div>
-
-                <div className="absolute top-6 right-6">
-                  <button className="btn btn-soft bg-transparent border-transparent btn-circle btn-error">
-                    <SquareXIcon size={30} onClick={() => setIsSearchOpen(false)} />
-                  </button>
-                </div>
+            <div className="container mx-auto max-w-7xl py-6 flex-1 overflow-y-auto">
+              <p className="font-bold text-3xl text-accent mb-6">Популярные товары</p>
+              <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-6">
+                {popularProducts.map((product, index) => (
+                  <ColProductCard key={index} card={product} />
+                ))}
               </div>
             </div>
-          )
-        }
+          </div>
+        )}
       </nav>
     </div>
   );

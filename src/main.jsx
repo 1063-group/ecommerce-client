@@ -8,10 +8,7 @@ import { store, persistor } from "./redux/store";
 import { PersistGate } from "redux-persist/integration/react";
 
 // Router
-import {
-  createBrowserRouter,
-  RouterProvider,
-} from "react-router-dom";
+import { createBrowserRouter, RouterProvider } from "react-router-dom";
 
 // Guards
 import PrivateRouter from "./guard/PrivateRouter.jsx";
@@ -29,6 +26,7 @@ import FilteredProducts from "./pages/FilteredProducts.jsx";
 import SingleProducts from "./pages/SingleProducts.jsx";
 import Korzinka from "./pages/Korzinka.jsx";
 import Favorites from "./pages/Fovorites.jsx";
+import Rasrochka from "./pages/Rasrochka.jsx";
 
 // Toast
 import { Toaster } from "react-hot-toast";
@@ -36,7 +34,6 @@ import { Toaster } from "react-hot-toast";
 // Router config
 const router = createBrowserRouter(
   [
-    // 👤 Profile
     {
       path: "/profile",
       element: (
@@ -58,8 +55,6 @@ const router = createBrowserRouter(
       ],
       errorElement: <div>Profile page not found</div>,
     },
-
-    // ✅ Verify account
     {
       path: "/verify-account",
       element: (
@@ -68,26 +63,21 @@ const router = createBrowserRouter(
         </PrivateRouter>
       ),
     },
-
-    // 🔑 Auth
     { path: "/login", element: <Login /> },
     { path: "/register", element: <Register /> },
     { path: "/telegram/callback", element: <TelegramCallback /> },
-
-    // 🏠 Main site
     {
       path: "/",
-      element: <App />, // ⚠️ App.jsx ichida <Outlet /> bo‘lishi kerak
+      element: <App />,
       children: [
         { index: true, element: <Home /> },
         { path: "categories/:category", element: <FilteredProducts /> },
         { path: "korzinka", element: <Korzinka /> },
         { path: "favorites", element: <Favorites /> },
+        { path: "rasrochka", element: <Rasrochka /> },
+        { path: "products/:id", element: <SingleProducts /> },
       ],
     },
-    { path: "products/:id", element: <SingleProducts /> }, // ✅ Product detail
-
-    // ❌ 404
     {
       path: "*",
       element: (
@@ -101,7 +91,6 @@ const router = createBrowserRouter(
               The page you're looking for doesn't exist.
             </p>
             <a href="/" className="btn btn-primary">
-            {/* back to home navigate */}
               Back to Home
             </a>
           </div>

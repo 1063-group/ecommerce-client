@@ -9,9 +9,12 @@ const Header = () => {
   return (
     <div>
       <InfoBar />
-      <Navbar />
-      <SubNavbar />
-      <BannerSection />
+       <SubNavbar />
+      
+         {/* <Navbar /> */}
+    
+     
+      {/* <BannerSection /> */}
     </div>
   )
 }
