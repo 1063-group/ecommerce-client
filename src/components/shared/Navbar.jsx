@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import {
   ShoppingCart,
   User,
@@ -19,6 +19,8 @@ export default function Navbar() {
   const [isMobileMenu, setIsMobileMenu] = useState(false);
   const [isSearchOpen, setIsSearchOpen] = useState(false);
   const [popularProducts, setPopularProducts] = useState([]);
+  const [catalogItems, setCatalogItems] = useState([]);
+  const catalogRef = useRef(null); // ✅ для клика вне меню
 
   const navItems = [
     { id: 1, label: "Сравнение", icon: BarChart2 },
@@ -26,19 +28,6 @@ export default function Navbar() {
     { id: 3, label: "Корзина", icon: ShoppingCart, badge: true, path: "/korzinka" },
     { id: 4, label: "Войти", icon: User , path: "/login"},
   ];
-
-  const catalogItems = [
-    "Телефоны",
-    "Ноутбуки",
-    "Бытовая техника",
-    "Одежда",
-    "Аксессуары",
-  ];
-
-  const handleOutsideClick = () => {
-    setIsCatalogOpen(false);
-    setIsMobileMenu(false);
-  };
 
   const getPopularProducts = async () => {
     try {
@@ -50,13 +39,39 @@ export default function Navbar() {
     }
   };
 
+  const getCategories = async () => {
+    try {
+      const request = await fetch("https://dummyjson.com/products/category-list");
+      const response = await request.json();
+      setCatalogItems(response);
+    } catch (e) {
+      console.log("category error:", e);
+    }
+  };
+
   useEffect(() => {
     getPopularProducts();
+    getCategories();
   }, []);
 
+  // ✅ обработка клика вне меню
+  useEffect(() => {
+    const handleClickOutside = (e) => {
+      if (catalogRef.current && !catalogRef.current.contains(e.target)) {
+        setIsCatalogOpen(false);
+      }
+    };
+    if (isCatalogOpen) {
+      document.addEventListener("mousedown", handleClickOutside);
+    }
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, [isCatalogOpen]);
+
   return (
-    <div onClick={handleOutsideClick} className="bg-base-300">
-      <nav className="bg-base-300 shadow-md py-4 sticky top-0 z-50">
+    <div className="bg-base-300">
+      <nav className="bg-base-300 shadow-md py-4">
         <Container>
           <div className="flex items-center justify-between">
             {/* Logo and Catalog */}
@@ -68,13 +83,10 @@ export default function Navbar() {
                 MarsShop
               </span>
 
-              <div className="relative hidden sm:block">
+              <div className="relative hidden sm:block" ref={catalogRef}>
                 <button
                   className="px-4 py-2 border border-base-content/20 rounded-lg text-sm text-base-content hover:bg-base-200 transition-colors flex items-center gap-2"
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    setIsCatalogOpen(!isCatalogOpen);
-                  }}
+                  onClick={() => setIsCatalogOpen(!isCatalogOpen)}
                 >
                   <Menu size={18} />
                   <span>Каталог</span>
@@ -82,18 +94,26 @@ export default function Navbar() {
 
                 {isCatalogOpen && (
                   <div
-                    className="absolute top-full mt-2 bg-base-100 border border-base-300 rounded-xl shadow-lg w-52 z-50"
-                    onClick={(e) => e.stopPropagation()}
+                    className="absolute top-full mt-2 bg-base-100 border border-base-300 rounded-xl shadow-xl w-[600px] p-4 z-50"
                   >
-                    <ul className="py-2 bg-base-200 rounded-xl">
-                      {catalogItems.map((item, idx) => (
-                        <li key={idx}>
-                          <a className="block px-4 py-2 text-sm text-base-content hover:bg-primary hover:text-primary-content transition-colors cursor-pointer">
+                    {catalogItems.length > 0 ? (
+                      <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
+                        {catalogItems.map((item, idx) => (
+                          <button
+                            key={idx}
+                            className="px-5 py-3 text-md text-left text-base-content bg-base-200 rounded-lg hover:bg-primary hover:text-primary-content transition-colors"
+                            onClick={() => {
+                              navigate(`/category/${item}`);
+                              setIsCatalogOpen(false);
+                            }}
+                          >
                             {item}
-                          </a>
-                        </li>
-                      ))}
-                    </ul>
+                          </button>
+                        ))}
+                      </div>
+                    ) : (
+                      <p className="text-sm text-base-content">Загрузка...</p>
+                    )}
                   </div>
                 )}
               </div>
@@ -122,15 +142,12 @@ export default function Navbar() {
                   <button
                     key={item.id}
                     className="relative flex flex-col items-center text-sm text-base-content hover:text-primary transition-colors p-2"
-                    onClick={() => item.path && navigate(item.path)}
+                    onClick={() => {
+                      if (item.path) navigate(item.path);
+                    }}
                   >
                     <Icon size={20} />
                     <span className="mt-1">{item.label}</span>
-                    {item.badge && cartCount > 0 && (
-                      <span className="absolute -top-1 -right-1 bg-primary text-primary-content text-xs rounded-full px-1.5 py-0.5 min-w-[20px] text-center">
-                        {cartCount}
-                      </span>
-                    )}
                   </button>
                 );
               })}
@@ -139,10 +156,7 @@ export default function Navbar() {
             {/* Mobile Menu Button */}
             <button
               className="sm:hidden p-2 text-base-content hover:text-primary transition-colors"
-              onClick={(e) => {
-                e.stopPropagation();
-                setIsMobileMenu(!isMobileMenu);
-              }}
+              onClick={() => setIsMobileMenu(!isMobileMenu)}
             >
               <Menu size={24} />
             </button>
@@ -178,15 +192,26 @@ export default function Navbar() {
                 </button>
 
                 {isCatalogOpen && (
-                  <div className="mt-2 pl-4">
-                    {catalogItems.map((item, idx) => (
-                      <a
-                        key={idx}
-                        className="block px-4 py-2 text-sm text-base-content hover:bg-primary hover:text-primary-content transition-colors cursor-pointer rounded-lg"
-                      >
-                        {item}
-                      </a>
-                    ))}
+                  <div className="mt-2 grid grid-cols-2 gap-2 pl-2">
+                    {catalogItems.length > 0 ? (
+                      catalogItems.map((item, idx) => (
+                        <button
+                          key={idx}
+                          className="px-3 py-2 text-sm text-left text-base-content bg-base-200 rounded-lg hover:bg-primary hover:text-primary-content transition-colors"
+                          onClick={() => {
+                            navigate(`/category/${item}`);
+                            setIsCatalogOpen(false);
+                            setIsMobileMenu(false);
+                          }}
+                        >
+                          {item}
+                        </button>
+                      ))
+                    ) : (
+                      <p className="px-4 py-2 text-sm text-base-content">
+                        Загрузка...
+                      </p>
+                    )}
                   </div>
                 )}
               </div>
@@ -199,7 +224,9 @@ export default function Navbar() {
                     <button
                       key={item.id}
                       className="relative flex items-center justify-center gap-2 p-3 text-sm text-base-content hover:text-primary hover:bg-base-200 transition-colors rounded-lg"
-                      onClick={() => item.path && navigate(item.path)}
+                      onClick={() => {
+                        if (item.path) navigate(item.path);
+                      }}
                     >
                       <Icon size={18} />
                       <span>{item.label}</span>
@@ -216,33 +243,34 @@ export default function Navbar() {
           </div>
         )}
 
-        {/* Fullscreen Search Overlay */}
+        {/* Search Overlay */}
         {isSearchOpen && (
-          <div className="fixed inset-0 bg-base-300/95 z-[9999] flex flex-col">
-            <div className="container mx-auto max-w-7xl py-10 flex gap-2">
+          <div className="fixed inset-0 bg-base-300/95 z-[9999] h-screen w-full">
+            <div className="container mx-auto border-b max-w-7xl py-10 flex">
               <input
                 type="text"
                 placeholder="Поиск по каталогу"
-                autoFocus
-                className="flex-1 px-4 py-2 min-h-[55px] rounded-l-lg bg-base-200 text-base-content placeholder:text-base-content/60 focus:outline-none shadow-sm border border-base-300"
+                autoFocus={isSearchOpen && true}
+                className="flex-1 px-4 py-2 w-full min-h-[55px] rounded-l-lg bg-base-200 text-base-content placeholder:text-base-content/60 focus:outline-none shadow-sm border border-base-300"
               />
-              <button className="px-4 py-2 min-h-[55px] bg-primary hover:bg-primary/80 text-primary-content rounded-r-lg transition-colors border border-primary border-l-0">
+              <button className="px-4 py-2  min-h-[55px] bg-primary hover:bg-primary/80 text-primary-content rounded-r-lg transition-colors border border-primary border-l-0">
                 <Search size={18} />
-              </button>
-              <button
-                className="btn btn-soft bg-transparent border-transparent btn-circle btn-error ml-2"
-                onClick={() => setIsSearchOpen(false)}
-              >
-                <SquareXIcon size={30} />
               </button>
             </div>
 
-            <div className="container mx-auto max-w-7xl py-6 flex-1 overflow-y-auto">
-              <p className="font-bold text-3xl text-accent mb-6">Популярные товары</p>
-              <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-6">
+            <div className="max-w-7xl mx-auto container py-6">
+              <p className="font-bold text-3xl text-accent">Популярные товары</p>
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-6 mt-6">
                 {popularProducts.map((product, index) => (
                   <ColProductCard key={index} card={product} />
                 ))}
+              </div>
+
+              <div className="absolute top-6 right-6">
+                <button className="btn btn-soft bg-transparent border-transparent btn-circle btn-error">
+                  <SquareXIcon size={30} onClick={() => setIsSearchOpen(false)} />
+                </button>
               </div>
             </div>
           </div>

@@ -4,14 +4,13 @@ import { Heart, BarChart2, ShoppingCart } from "lucide-react"
 import { Link } from "react-router"
 
 export default function ColDiscountCard({
-  id = 1,
-  title = "Redmi 13C (Бывший в употреблении)",
+  title = "Samsung Galaxy A17 Light Blue 8/256 GB",
   price = 1000000,
   discount = 18,
-  image = "https://olcha.uz/image/220x220/products/cdn_1/supplier/stores/1/2025-09-18/wI0On5FHgzwkeHByFVL2VODCayL9v1LssoVJB8Uaq1ntjMj502S52AepywLi.jpg",
+  image = "https://olcha.uz/image/220x220/products/cdn_1/supplier/stores/1/2025-09-18/OfWVPPBnP7fpHYV2K6Ju4Idxs5CWKKWbqbGMOkbuLWtE4hzXDwxKKAXj1T1s.jpg",
 }) {
   return (
-    <Link to={"/products/" + id} className="card flex-1 min-w-[250px] w-full h-110 bg-base-100 border-2 border-primary rounded-2xl overflow-hidden relative shadow-md">
+    <Link to={"/products/"} className="card w-full h-110 bg-base-100 border-2 border-primary rounded-2xl overflow-hidden relative shadow-md">
       {/* Discount badge */}
       <div className="absolute top-2 left-2">
         <div className="badge bg-primary text-base-100 font-semibold">-{discount}%</div>
@@ -29,17 +28,17 @@ export default function ColDiscountCard({
 
       {/* Product image */}
       <figure className="px-6 pt-8">
-        <img src={image} alt="product" className="rounded-xl h-40 object-contain mx-auto" />
+        <img src={image} alt="product" className="rounded-xl h-50 object-contain mx-auto" />
       </figure>
 
       {/* Product info */}
       <div className="card-body px-4 py-4">
         <h2 className="card-title text-sm font-medium line-clamp-2">{title}</h2>
-        <p className="text-lg font-bold text-primary">{price}</p>
-        <p className="text-sm line-through ">{price}</p>
+        <p className="text-lg font-bold text-primary">{Number(price - (price / 100 * discount)).toLocaleString('Ru-ru')} <span className="text-xs">UZS</span></p>
+        <p className="text-sm line-through ">{Number(price).toLocaleString('Ru-ru')} UZS</p>
         <div className="mt-1">
           <div className="badge bg-primary text-netural font-medium whitespace-nowrap">
-            {(price/12).toFixed(0)} сум/мес
+            {(price / 12).toFixed(2)} UZS x 12 месяц
           </div>
         </div>
 
