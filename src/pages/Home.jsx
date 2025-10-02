@@ -9,7 +9,7 @@ import Container from '../components/shared/Container'
 import SkeletonCards from '../components/shared/SkeletonCards'
 import RowDiscauntCard from '../components/ui/cards/RowDiscountCard'
 import ColDiscauntCard from '../components/ui/cards/ColDiscountCard'
-
+import CategorySwiper from '../components/ui/promotions/CategorySwiper'
 const Home = () => {
   const [user, usetUser] = useState([])
   const [products, setProducts] = useState([])
@@ -73,25 +73,25 @@ const Home = () => {
         {/* smartphones cards */}
         <section className='py-10'>
           <Container>
+           
             <div className='bg-primary border border-primary rounded-2xl'>
               <div className="flex gap-2 p-5">
                 {/* BILOL = FETCH BILAN QILISH */}
                 <div className='max-w-[30%] flex flex-wrap flex-col justify-between'>
                   {smartphones.slice(0, 2).map((item, index) => <RowDiscauntCard key={index} title={item?.title} price={item?.price} discount={item?.discount} image={item?.thumbnail} />)}
                 </div>
-<<<<<<< HEAD
-                <div className='flex items-center flex-wrap h-[440px] overflow-y-hidden'>
-                  {smartphones.map((item, index) => <ColDiscauntCard key={index} title={item?.title} price={item?.price} discount={item?.discount} image={item?.thumbnail} />)}
-=======
                 <div className='flex items-center justify-center w-full'>
                   {laptops.slice(0, 4).map((item, index) => <ColDiscauntCard key={index} title={item?.title} price={item?.price} discount={item?.discount} image={item?.thumbnail} />)}
->>>>>>> 76ca0081b9743fb2055a163d2b4099452d2945eb
                 </div>
               </div>
             </div>
           </Container>
         </section>
         <PromotionBanner img={'https://olcha.uz/image/1440x302/homePage/cdn_1/2025-07-16/DvAmWwCXU8V2EDK0d3bFFo7YbIpfPT8euXbpAkSWU6PxaThfpP4GeGHfrLJN.jpg'} />
+        <div className='p-10'>
+          <CategorySwiper/>
+        </div>
+         
         <section className='py-20'>
           <Container>
             {
@@ -115,9 +115,13 @@ const Home = () => {
                 </div>
               )
             }
+
+           
           </Container>
         </section>
         <PromotionBanner />
+        
+        
       </main>
     </>
   );
