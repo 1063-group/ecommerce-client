@@ -31,9 +31,7 @@ const Korzinka = () => {
         <X size={28} />
       </button>
 
-      <h1 className="text-3xl font-bold mb-8 text-center">
-        🛒 Mening Korzinkam
-      </h1>
+      <h1 className="text-3xl font-bold mb-8 text-center">🛒 Mening Korzinkam</h1>
 
       {/* Bo‘sh holat */}
       {cartItems.length === 0 ? (
@@ -56,12 +54,12 @@ const Korzinka = () => {
                 {/* Chap tomon */}
                 <div className="flex items-center gap-4">
                   <img
-                    src={item.image}
-                    alt={item.name}
+                    src={item.image || item.thumbnail}
+                    alt={item.title}
                     className="w-24 h-24 object-cover rounded-lg border"
                   />
                   <div>
-                    <h3 className="font-semibold text-lg">{item.name}</h3>
+                    <h3 className="font-semibold text-lg">{item.title}</h3>
                     <p className="text-sm text-base-content/60">
                       {item.price.toLocaleString()} so‘m
                     </p>
@@ -92,6 +90,7 @@ const Korzinka = () => {
                   <button
                     onClick={() => dispatch(removeFromCart(item.id))}
                     className="text-error hover:text-error/80"
+                    title="O‘chirish"
                   >
                     <Trash2 size={22} />
                   </button>
@@ -104,9 +103,7 @@ const Korzinka = () => {
           <div className="mt-10 flex items-center justify-between bg-base-100 p-6 rounded-xl shadow-lg">
             <div>
               <h2 className="text-lg font-semibold">Jami:</h2>
-              <p className="text-2xl font-bold">
-                {total.toLocaleString()} so‘m
-              </p>
+              <p className="text-2xl font-bold">{total.toLocaleString()} so‘m</p>
             </div>
             <div className="flex gap-4">
               <button
@@ -115,7 +112,10 @@ const Korzinka = () => {
               >
                 Tozalash
               </button>
-              <button className="px-6 py-2 bg-primary text-primary-content rounded-lg hover:bg-primary/80">
+              <button
+                disabled={cartItems.length === 0}
+                className="px-6 py-2 bg-primary text-primary-content rounded-lg hover:bg-primary/80 disabled:opacity-50 disabled:cursor-not-allowed"
+              >
                 Buyurtma berish
               </button>
             </div>

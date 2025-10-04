@@ -2,7 +2,7 @@
 import React from "react";
 import { useSelector, useDispatch } from "react-redux";
 import { removeFromFavorites, clearFavorites } from "../redux/slices/favoritesSlice";
-import { Heart, X } from "lucide-react";
+import { Heart, X, Trash2 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import toast from "react-hot-toast";
 
@@ -11,9 +11,9 @@ const Fovorites = () => {
   const navigate = useNavigate();
   const favorites = useSelector((state) => state.favorites.favorites);
 
-  const handleRemove = (id, name) => {
+  const handleRemove = (id, title) => {
     dispatch(removeFromFavorites(id));
-    toast.success(`${name} удалён из избранного ❤️`);
+    toast.success(`${title} удалён из избранного ❤️`);
   };
 
   const handleClearAll = () => {
@@ -22,24 +22,21 @@ const Fovorites = () => {
   };
 
   return (
-    <div className="relative max-w-6xl mx-auto px-4 py-10">
-      {/* Кнопка выхода */}
+    <div className="relative max-w-7xl mx-auto px-4 py-12">
+      {/* ❌ Orqaga tugmasi */}
       <button
         onClick={() => navigate("/")}
-        className="absolute top-6 right-6 p-3 rounded-full hover:bg-base-200"
+        className="absolute top-6 right-6 p-3 rounded-full bg-base-200 hover:bg-base-300 transition"
       >
-        <X size={28} />
+        <X size={26} />
       </button>
-      {/* ajkndjkasndkjasndkjnasd */}
 
-      <h1 className="text-3xl font-bold mb-8 text-center">
-         Мои Избранные
-      </h1>
-{/* asjdnasjdnakjsn */}
-      {/* Пустое состояние */}
+      <h1 className="text-3xl font-bold mb-10 text-center">💖 Мои Избранные</h1>
+
+      {/* Bo‘sh holat */}
       {favorites.length === 0 ? (
-        <div className="flex flex-col items-center justify-center py-20 bg-base-200 rounded-2xl shadow-lg">
-          <Heart size={80} className="text-base-content/40 mb-4" />
+        <div className="flex flex-col items-center justify-center py-24 bg-base-200 rounded-2xl shadow-lg">
+          <Heart size={90} className="text-pink-500 mb-6" />
           <h2 className="text-xl font-semibold">Список избранного пуст</h2>
           <p className="text-sm text-base-content/60 mt-2">
             Добавьте товары в избранное
@@ -47,31 +44,34 @@ const Fovorites = () => {
         </div>
       ) : (
         <>
-          {/* Список товаров */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+          {/* Mahsulotlar grid */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
             {favorites.map((item) => (
               <div
                 key={item.id}
-                className="bg-base-100 rounded-xl shadow-md overflow-hidden flex flex-col"
+                className="bg-base-100 rounded-xl shadow-lg overflow-hidden hover:shadow-xl transition flex flex-col"
               >
                 <img
-                  src={item.image}
-                  alt={item.name}
+                  src={item.image || item.thumbnail}
+                  alt={item.title}
                   className="w-full aspect-[4/3] object-cover"
                 />
-                <div className="p-4 flex flex-col justify-between flex-1">
+                <div className="p-5 flex flex-col justify-between flex-1">
                   <div>
-                    <h3 className="font-semibold text-lg">{item.name}</h3>
-                    <p className="text-sm text-base-content/60">
-                      {item.price.toLocaleString()} сум
+                    <h3 className="font-semibold text-lg line-clamp-1">{item.title}</h3>
+                    <p className="text-sm text-base-content/70 mt-1">
+                      {item.price.toLocaleString()} so‘m
                     </p>
                   </div>
-                  <div className="mt-3 flex justify-between items-center">
+
+                  {/* Delete tugmasi */}
+                  <div className="mt-4 flex justify-end">
                     <button
-                      onClick={() => handleRemove(item.id, item.name)}
-                      className="text-error hover:text-error/80"
+                      onClick={() => handleRemove(item.id, item.title)}
+                      className="flex items-center gap-2 px-3 py-2 text-sm bg-red-100 text-red-600 rounded-lg hover:bg-red-200 transition"
                     >
-                      <X size={22} />
+                      <Trash2 size={18} />
+                      Удалить
                     </button>
                   </div>
                 </div>
@@ -79,12 +79,13 @@ const Fovorites = () => {
             ))}
           </div>
 
-          {/* Кнопка очистки */}
-          <div className="mt-10 flex justify-end">
+          {/* Tozalash tugmasi */}
+          <div className="mt-12 flex justify-end">
             <button
               onClick={handleClearAll}
-              className="px-5 py-2 border rounded-lg hover:bg-base-200"
+              className="flex items-center gap-2 px-6 py-3 bg-red-500 text-white rounded-lg shadow hover:bg-red-600 transition"
             >
+              <Trash2 size={20} />
               Очистить всё
             </button>
           </div>

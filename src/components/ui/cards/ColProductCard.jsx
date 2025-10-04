@@ -8,6 +8,7 @@ import toast from "react-hot-toast";
 import { FaHeart, FaRegHeart } from "react-icons/fa";
 import { BiBarChart } from "react-icons/bi";
 import { FiShoppingCart } from "react-icons/fi";
+import SingleProducts from "../../../pages/SingleProducts";
 
 const ColProductCard = ({ card }) => {
   const dispatch = useDispatch();
@@ -89,46 +90,50 @@ const ColProductCard = ({ card }) => {
       </Link>
 
       {/* Pastki qism */}
-      <div className="flex bg-base-100 rounded-xl flex-col gap-[20px] p-2">
-        <div className="main flex flex-col gap-3">
-          <div className="info flex flex-col gap-1 h-[86px]">
-            <p className="text-lg">{card?.category || "Нет Категории"}</p>
-            {/* Nomi ham link bo‘lsin */}
-            <Link to={`/products/${card.id}`} className="text-lg hover:underline">
-              {card?.title || "Нет Названия"}
-            </Link>
-          </div>
-          <div className="flex flex-col">
-            <p className="price text-lg font-bold max-w-[130px]">
-              {card.price
-                ? card.price.toLocaleString("ru-RU", {
+      <Link to={`/products/${card.id}`}>
+        <div className="flex bg-base-100 rounded-xl flex-col gap-[20px] p-2">
+          <div className="main flex flex-col gap-3">
+            <div className="info flex flex-col gap-1 h-[86px]">
+              <p className="text-lg">{card?.category || "Нет Категории"}</p>
+              {/* Nomi ham link bo‘lsin */}
+              <Link to={`/products/${card.id}`} className="text-lg hover:underline">
+                {card?.title || "Нет Названия"}
+              </Link>
+            </div>
+            <div className="flex flex-col">
+              <p className="price text-lg font-bold max-w-[130px]">
+                {card.price
+                  ? card.price.toLocaleString("ru-RU", {
                     style: "currency",
                     currency: "UZS",
                   })
-                : "Нет Цены"}
-            </p>
-            <p className="bg-warning/60 text-sm rounded max-w-[140px] p-1 font-medium">
-              {card?.price
-                ? Math.floor(card.price / 12).toLocaleString("ru-RU") +
+                  : "Нет Цены"}
+              </p>
+              <p className="bg-warning/60 text-sm rounded max-w-[140px] p-1 font-medium">
+                {card?.price
+                  ? Math.floor(card.price / 12).toLocaleString("ru-RU") +
                   " UZS x12 мес"
-                : "Нет Цены"}
-            </p>
+                  : "Нет Цены"}
+              </p>
+            </div>
+          </div>
+
+          {/* Tugmalar */}
+          <div className="buy flex justify-between items-center gap-2">
+            <button
+              onClick={handleAddToCart}
+              className="btn btn-outline btn-primary rounded-xl"
+            >
+              <FiShoppingCart />
+            </button>
+            <button className="btn btn-outline btn-secondary rounded-xl flex-1">
+              В рассрочку
+            </button>
           </div>
         </div>
+      </Link>
 
-        {/* Tugmalar */}
-        <div className="buy flex justify-between items-center gap-2">
-          <button
-            onClick={handleAddToCart}
-            className="btn btn-outline btn-primary rounded-xl"
-          >
-            <FiShoppingCart />
-          </button>
-          <button className="btn btn-outline btn-secondary rounded-xl flex-1">
-            В рассрочку
-          </button>
-        </div>
-      </div>
+
     </div>
   );
 };

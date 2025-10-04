@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
+
 import {
   Phone,
   Globe,
@@ -15,7 +16,7 @@ const SubNavbar = ({ lang, onLangChange }) => {
   const navigate = useNavigate();
   const [isLangDropdownOpen, setIsLangDropdownOpen] = useState(false);
 
-  const handleSellerClick = () => navigate("/login");
+  const handleSellerClick = () => navigate("/sell-on");
 
   return (
     <div className="bg-base-300 text-base-content shadow-sm">
@@ -25,7 +26,7 @@ const SubNavbar = ({ lang, onLangChange }) => {
           <div className="flex flex-wrap items-center gap-2 sm:gap-4">
             {/* 0% Рассрочка */}
             <Link
-              to="/installment"
+              to="/rasrochka"
               className="badge badge-accent gap-2 font-bold cursor-pointer animate-pulse"
             >
               <CreditCard className="w-4 h-4" />
@@ -108,8 +109,8 @@ const SubNavbar = ({ lang, onLangChange }) => {
                 />
               </button>
               {isLangDropdownOpen && (
-                <div className="absolute  right-0 mt-2 w-32 bg-base-100 border border-base-200 rounded-lg shadow-lg z-50 py-1">
-                  {["Ўзб    ", "O'z", "Рус"].map((l) => (
+                <div className="absolute right-0 mt-2 w-32 bg-base-100 border border-base-200 rounded-lg shadow-lg z-50 py-1">
+                  {["Ўзб", "O'z", "Рус"].map((l) => (
                     <button
                       key={l}
                       onClick={() => {

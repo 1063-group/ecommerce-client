@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import {
   ShoppingCart,
   User,
@@ -18,36 +18,16 @@ export default function Navbar() {
   const [isCatalogOpen, setIsCatalogOpen] = useState(false);
   const [isMobileMenu, setIsMobileMenu] = useState(false);
   const [isSearchOpen, setIsSearchOpen] = useState(false);
-  const [searchValue, setSearchValue] = useState("");
   const [popularProducts, setPopularProducts] = useState([]);
-  const [searchResults, setSearchResults] = useState([]);
-  const [categoryProducts, setCategoryProducts] = useState([]);
+  const [catalogItems, setCatalogItems] = useState([]);
+  const catalogRef = useRef(null); // ✅ для клика вне меню
 
   const navItems = [
     { id: 1, label: "Сравнение", icon: BarChart2 },
     { id: 2, label: "Избранные", icon: Heart, path: "/favorites" },
-    {
-      id: 3,
-      label: "Корзина",
-      icon: ShoppingCart,
-      badge: true,
-      path: "/korzinka",
-    },
-    { id: 4, label: "Войти", icon: User },
+    { id: 3, label: "Корзина", icon: ShoppingCart, badge: true, path: "/korzinka" },
+    { id: 4, label: "Войти", icon: User , path: "/login"},
   ];
-
-  const catalogItems = [
-    { id: 1, label: "Телефоны", query: "smartphones" },
-    { id: 2, label: "Ноутбуки", query: "laptops" },
-    { id: 3, label: "Бытовая техника", query: "home-decoration" },
-    { id: 4, label: "Одежда", query: "mens-shirts" },
-    { id: 5, label: "Аксессуары", query: "womens-bags" },
-  ];
-
-  const handleOutsideClick = () => {
-    setIsCatalogOpen(false);
-    setIsMobileMenu(false);
-  };
 
   const getPopularProducts = async () => {
     try {
@@ -59,59 +39,38 @@ export default function Navbar() {
     }
   };
 
-  useEffect(() => {
-    getPopularProducts();
-  }, []);
-
-  const handleCategoryClick = async (query) => {
+  const getCategories = async () => {
     try {
-      const res = await fetch(
-        `https://dummyjson.com/products/category/${query}`
-      );
-      const data = await res.json();
-      setCategoryProducts(data.products || []);
-      setIsCatalogOpen(false);
-      setIsSearchOpen(true); // 🔹 overlay ochiladi va productlar ko‘rinadi
-    } catch (err) {
-      console.error("Category API error:", err);
+      const request = await fetch("https://dummyjson.com/products/category-list");
+      const response = await request.json();
+      setCatalogItems(response);
+    } catch (e) {
+      console.log("category error:", e);
     }
   };
-  // 🔎 Real-time search API chaqirish
+
   useEffect(() => {
-    const fetchSearch = async () => {
-      if (searchValue.trim() === "") {
-        setSearchResults([]);
-        return;
-      }
-      try {
-        const res = await fetch(
-          `https://dummyjson.com/products/search?q=${encodeURIComponent(
-            searchValue
-          )}`
-        );
-        const data = await res.json();
-        setSearchResults(data.products || []);
-      } catch (err) {
-        console.error("Search API error:", err);
+    getPopularProducts();
+    getCategories();
+  }, []);
+
+  // ✅ обработка клика вне меню
+  useEffect(() => {
+    const handleClickOutside = (e) => {
+      if (catalogRef.current && !catalogRef.current.contains(e.target)) {
+        setIsCatalogOpen(false);
       }
     };
-
-    fetchSearch();
-  }, [searchValue]);
-
-  const filteredProducts =
-    searchValue.trim() !== ""
-      ? searchResults.length > 0
-        ? searchResults
-        : popularProducts.filter((product) =>
-            product.title.toLowerCase().includes(searchValue.toLowerCase())
-          )
-      : categoryProducts.length > 0
-      ? categoryProducts
-      : popularProducts;
+    if (isCatalogOpen) {
+      document.addEventListener("mousedown", handleClickOutside);
+    }
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, [isCatalogOpen]);
 
   return (
-    <div onClick={handleOutsideClick} className="bg-base-300">
+    <div className="bg-base-300">
       <nav className="bg-base-300 shadow-md py-4">
         <Container>
           <div className="flex items-center justify-between">
@@ -124,13 +83,10 @@ export default function Navbar() {
                 MarsShop
               </span>
 
-              <div className="relative hidden sm:block">
+              <div className="relative hidden sm:block" ref={catalogRef}>
                 <button
                   className="px-4 py-2 border border-base-content/20 rounded-lg text-sm text-base-content hover:bg-base-200 transition-colors flex items-center gap-2"
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    setIsCatalogOpen(!isCatalogOpen);
-                  }}
+                  onClick={() => setIsCatalogOpen(!isCatalogOpen)}
                 >
                   <Menu size={18} />
                   <span>Каталог</span>
@@ -138,27 +94,32 @@ export default function Navbar() {
 
                 {isCatalogOpen && (
                   <div
-                    className="absolute top-full mt-2 bg-base-100 border border-base-300 rounded-xl shadow-lg w-52 z-50"
-                    onClick={(e) => e.stopPropagation()}
+                    className="absolute top-full mt-2 bg-base-100 border border-base-300 rounded-xl shadow-xl w-[600px] p-4 z-50"
                   >
-                    <ul className="py-2 bg-base-200 rounded-xl">
-                      {catalogItems.map((item) => (
-                        <li key={item.id}>
+                    {catalogItems.length > 0 ? (
+                      <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
+                        {catalogItems.map((item, idx) => (
                           <button
-                            onClick={() => handleCategoryClick(item.query)}
-                            className="w-full text-left block px-4 py-2 text-sm text-base-content hover:bg-primary hover:text-primary-content transition-colors cursor-pointer"
+                            key={idx}
+                            className="px-5 py-3 text-md text-left text-base-content bg-base-200 rounded-lg hover:bg-primary hover:text-primary-content transition-colors"
+                            onClick={() => {
+                              navigate(`/category/${item}`);
+                              setIsCatalogOpen(false);
+                            }}
                           >
-                            {item.label}
+                            {item}
                           </button>
-                        </li>
-                      ))}
-                    </ul>
+                        ))}
+                      </div>
+                    ) : (
+                      <p className="text-sm text-base-content">Загрузка...</p>
+                    )}
                   </div>
                 )}
               </div>
             </div>
 
-            {/* Search Bar (desktop) */}
+            {/* Desktop Search */}
             <div className="hidden md:flex flex-1 mx-6">
               <div className="flex w-full">
                 <input
@@ -180,7 +141,7 @@ export default function Navbar() {
               </div>
             </div>
 
-            {/* Desktop Navigation Items */}
+            {/* Desktop Nav Items */}
             <div className="hidden sm:flex items-center gap-6">
               {navItems.map((item) => {
                 const Icon = item.icon;
@@ -202,10 +163,7 @@ export default function Navbar() {
             {/* Mobile Menu Button */}
             <button
               className="sm:hidden p-2 text-base-content hover:text-primary transition-colors"
-              onClick={(e) => {
-                e.stopPropagation();
-                setIsMobileMenu(!isMobileMenu);
-              }}
+              onClick={() => setIsMobileMenu(!isMobileMenu)}
             >
               <Menu size={24} />
             </button>
@@ -245,15 +203,26 @@ export default function Navbar() {
                 </button>
 
                 {isCatalogOpen && (
-                  <div className="mt-2 pl-4">
-                    {catalogItems.map((item, idx) => (
-                      <a
-                        key={idx}
-                        className="block px-4 py-2 text-sm text-base-content hover:bg-primary hover:text-primary-content transition-colors cursor-pointer rounded-lg"
-                      >
-                        {item}
-                      </a>
-                    ))}
+                  <div className="mt-2 grid grid-cols-2 gap-2 pl-2">
+                    {catalogItems.length > 0 ? (
+                      catalogItems.map((item, idx) => (
+                        <button
+                          key={idx}
+                          className="px-3 py-2 text-sm text-left text-base-content bg-base-200 rounded-lg hover:bg-primary hover:text-primary-content transition-colors"
+                          onClick={() => {
+                            navigate(`/category/${item}`);
+                            setIsCatalogOpen(false);
+                            setIsMobileMenu(false);
+                          }}
+                        >
+                          {item}
+                        </button>
+                      ))
+                    ) : (
+                      <p className="px-4 py-2 text-sm text-base-content">
+                        Загрузка...
+                      </p>
+                    )}
                   </div>
                 )}
               </div>
@@ -285,43 +254,33 @@ export default function Navbar() {
           </div>
         )}
 
-        {/* Fullscreen Search Overlay */}
+        {/* Search Overlay */}
         {isSearchOpen && (
           <div className="fixed inset-0 bg-base-300/95 z-[9999] h-screen w-full">
             <div className="container mx-auto border-b max-w-7xl py-10 flex">
               <input
                 type="text"
                 placeholder="Поиск по каталогу"
-                autoFocus
-                value={searchValue}
-                onChange={(e) => setSearchValue(e.target.value)}
+                autoFocus={isSearchOpen && true}
                 className="flex-1 px-4 py-2 w-full min-h-[55px] rounded-l-lg bg-base-200 text-base-content placeholder:text-base-content/60 focus:outline-none shadow-sm border border-base-300"
               />
-              <button
-                className="px-4 py-2 min-h-[55px] bg-primary hover:bg-primary/80 text-primary-content rounded-r-lg transition-colors border border-primary border-l-0"
-                onClick={() => setIsSearchOpen(true)}
-              >
+              <button className="px-4 py-2  min-h-[55px] bg-primary hover:bg-primary/80 text-primary-content rounded-r-lg transition-colors border border-primary border-l-0">
                 <Search size={18} />
               </button>
             </div>
 
             <div className="max-w-7xl mx-auto container py-6">
-              <p className="font-bold text-3xl text-accent">
-                Результаты поиска
-              </p>
+              <p className="font-bold text-3xl text-accent">Популярные товары</p>
 
               <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-6 mt-6">
-                {filteredProducts.map((product, index) => (
+                {popularProducts.map((product, index) => (
                   <ColProductCard key={index} card={product} />
                 ))}
               </div>
 
               <div className="absolute top-6 right-6">
-                <button
-                  className="btn btn-soft bg-transparent border-transparent btn-circle btn-error"
-                  onClick={() => setIsSearchOpen(false)}
-                >
-                  <SquareXIcon size={30} />
+                <button className="btn btn-soft bg-transparent border-transparent btn-circle btn-error">
+                  <SquareXIcon size={30} onClick={() => setIsSearchOpen(false)} />
                 </button>
               </div>
             </div>
