@@ -27,6 +27,7 @@ import SingleProducts from "./pages/SingleProducts.jsx";
 import Korzinka from "./pages/Korzinka.jsx";
 import Favorites from "./pages/Fovorites.jsx";
 import Rasrochka from "./pages/Rasrochka.jsx";
+import SellOnPage from "./pages/SellOn.jsx";
 
 // Toast
 import { Toaster } from "react-hot-toast";
@@ -66,6 +67,7 @@ const router = createBrowserRouter(
     { path: "/login", element: <Login /> },
     { path: "/register", element: <Register /> },
     { path: "/telegram/callback", element: <TelegramCallback /> },
+
     {
       path: "/",
       element: <App />,
@@ -76,6 +78,7 @@ const router = createBrowserRouter(
         { path: "favorites", element: <Favorites /> },
         { path: "rasrochka", element: <Rasrochka /> },
         { path: "products/:id", element: <SingleProducts /> },
+        {path: "sell-on", element: <SellOnPage />}
       ],
     },
     {

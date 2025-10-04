@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
+
 import {
   Phone,
   Globe,
@@ -15,7 +16,7 @@ const SubNavbar = ({ lang, onLangChange }) => {
   const navigate = useNavigate();
   const [isLangDropdownOpen, setIsLangDropdownOpen] = useState(false);
 
-  const handleSellerClick = () => navigate("/login");
+  const handleSellerClick = () => navigate("/sell-on");
 
   return (
     <div className="bg-base-300 text-base-content shadow-sm">
