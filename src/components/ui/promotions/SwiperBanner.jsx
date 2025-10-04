@@ -4,7 +4,6 @@ import { Pagination, Autoplay } from "swiper/modules";
 import "swiper/css";
 import "swiper/css/pagination";
 import DiscountCard from "../cards/DiscountCard";
-import Container from "../../shared/Container";
 export default function BannerSection() {
   const [products, setProducts] = useState([]);
 
@@ -21,7 +20,6 @@ export default function BannerSection() {
   }, []);
 
   return (
-    <Container>
       <div className="flex gap-4 w-full p-10">
         <div className="w-3/4 relative">
           <Swiper
@@ -53,6 +51,5 @@ export default function BannerSection() {
 
         <DiscountCard />
       </div>
-    </Container>
   );
 }
