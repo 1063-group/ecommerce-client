@@ -4,7 +4,6 @@ const DiscountCard = () => {
   const [time, setTime] = useState({ hours: 6, minutes: 48, seconds: 56 });
   const [productImg, setProductImg] = useState("");
 
-  // Countdown
   useEffect(() => {
     const timer = setInterval(() => {
       setTime((prev) => {
