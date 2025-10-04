@@ -61,14 +61,14 @@ export default function RowProductCard({ product }) {
           </div>
 
           <div className="buy flex justify-between items-center">
-            <button className="px-3 py-3 border border-3 text-2xl text-primary rounded-xl hover:bg-primary/20 transition">
+            <button className="px-3 py-3  border-3 text-2xl text-primary rounded-xl hover:bg-primary/20 transition">
               <FiShoppingCart />
             </button>
 
             {/* Bu ham single sahifaga olib ketsin */}
             <Link
               to={`/products/${product.id}`}
-              className="text-xl text-secondary border border-3 rounded-xl px-7 py-2 hover:bg-secondary/20 transition"
+              className="text-xl text-secondary  border-3 rounded-xl px-7 py-2 hover:bg-secondary/20 transition"
             >
               В рассрочку
             </Link>

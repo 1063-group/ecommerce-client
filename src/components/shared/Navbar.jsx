@@ -26,7 +26,7 @@ export default function Navbar() {
     { id: 1, label: "Сравнение", icon: BarChart2 },
     { id: 2, label: "Избранные", icon: Heart, path: "/favorites" },
     { id: 3, label: "Корзина", icon: ShoppingCart, badge: true, path: "/korzinka" },
-    { id: 4, label: "Войти", icon: User },
+    { id: 4, label: "Войти", icon: User , path: "/login"},
   ];
 
   const getPopularProducts = async () => {
@@ -119,7 +119,7 @@ export default function Navbar() {
               </div>
             </div>
 
-            {/* Search Bar */}
+            {/* Desktop Search */}
             <div className="hidden md:flex flex-1 mx-6">
               <div className="flex w-full">
                 <input
@@ -134,7 +134,7 @@ export default function Navbar() {
               </div>
             </div>
 
-            {/* Desktop Navigation Items */}
+            {/* Desktop Nav Items */}
             <div className="hidden sm:flex items-center gap-6">
               {navItems.map((item) => {
                 const Icon = item.icon;
