@@ -33,7 +33,7 @@ export default function Navbar() {
       badge: true,
       path: "/korzinka",
     },
-    { id: 4, label: "Войти", icon: User },
+    { id: 4, label: "Войти", icon: User, path: "/login"},
   ];
 
   const catalogItems = [
