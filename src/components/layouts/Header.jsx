@@ -9,7 +9,6 @@ const Header = () => {
       <InfoBar />
       <Navbar />
       <SubNavbar />
-
     </div>
   )
 }
