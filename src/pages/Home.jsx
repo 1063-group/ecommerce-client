@@ -79,13 +79,8 @@ const Home = () => {
                 <div className='max-w-[30%] flex flex-wrap flex-col justify-between'>
                   {smartphones.slice(0, 2).map((item, index) => <RowDiscauntCard key={index} title={item?.title} price={item?.price} discount={item?.discount} image={item?.thumbnail} />)}
                 </div>
-<<<<<<< HEAD
-                <div className='flex items-center flex-wrap h-[440px] overflow-y-hidden'>
-                  {smartphones.map((item, index) => <ColDiscauntCard key={index} title={item?.title} price={item?.price} discount={item?.discount} image={item?.thumbnail} />)}
-=======
                 <div className='flex items-center justify-center w-full'>
                   {laptops.slice(0, 4).map((item, index) => <ColDiscauntCard key={index} title={item?.title} price={item?.price} discount={item?.discount} image={item?.thumbnail} />)}
->>>>>>> 76ca0081b9743fb2055a163d2b4099452d2945eb
                 </div>
               </div>
             </div>

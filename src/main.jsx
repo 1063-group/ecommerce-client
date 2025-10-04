@@ -30,6 +30,7 @@ import Rasrochka from "./pages/Rasrochka.jsx";
 
 // Toast
 import { Toaster } from "react-hot-toast";
+import News from "./pages/News.jsx";
 
 // Router config
 const router = createBrowserRouter(
@@ -75,6 +76,7 @@ const router = createBrowserRouter(
         { path: "korzinka", element: <Korzinka /> },
         { path: "favorites", element: <Favorites /> },
         { path: "rasrochka", element: <Rasrochka /> },
+        { path: "news", element: <News /> },
         { path: "products/:id", element: <SingleProducts /> },
       ],
     },
